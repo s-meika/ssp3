@@ -135,8 +135,8 @@ $INTNO_VALID.each do |inhno|
     $kernelCfgC.add("__near void")
     $kernelCfgC.add("_kernel_inthdr_entry_#{inhno}(void)")
     $kernelCfgC.add("{")
-    $kernelCfgC.add("\textern void _kernel_inthdr_#{inhno}(void);")
-    $kernelCfgC.add("\t_kernel_inthdr_#{inhno}();")
+    $kernelCfgC.add("\textern void #{$cfgData[:DEF_INH][inhno][:inthdr]}(void);")
+    $kernelCfgC.add("\t#{$cfgData[:DEF_INH][inhno][:inthdr]}();")
     $kernelCfgC.add2("}")
   end
 end
