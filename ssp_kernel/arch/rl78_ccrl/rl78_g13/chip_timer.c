@@ -142,3 +142,11 @@ void chip_hrt_raise_event(void)
 {
 	
 }
+
+/*
+ *  高分解能タイマ割込みハンドラ
+ */
+void chip_hrt_handler(void)
+{
+}
+

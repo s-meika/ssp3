@@ -96,6 +96,12 @@ extern void chip_hrt_set_event(HRTCNT hrtcnt);
  */
 extern void chip_hrt_raise_event(void);
 
+/*
+ *  高分解能タイマ割込みハンドラ
+ */
+extern void chip_hrt_handler(void);
+
+
 #endif /* TOPPERS_MACRO_ONLY */
 
 #endif /* TOPPERS_CHIP_TIMER_H */
