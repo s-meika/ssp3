@@ -1,0 +1,34 @@
+<porting.txtの章番号割り当て手順>
+
+Perlスクリプト assign_index.pl を使用する．
+
+$./assign_index.pl porting_temolate.txt porting.txt
+
+
+
+(section) X. と置き換える．X=1,2,...である．
+		次の(section)が現れると次の値へ移行する．
+(sub-section) X.Yと置き換える．Y=1,2,...である．Xはその時点での(section)の値で
+			ある．次の(sub-section)が現れると次の値へ移行する．
+			新しい(section)が現れた場合Yを1にリセットする
+(subsub-section) X.Y.Xと置き換える．Z=1,2,...である．
+			Xはその時点での(section)の値，Yはその時点での(sub-section)の
+			値である．次の(subsub-section)が現れると次の値へ移行する．
+			(subsub-section)が繰り上がった際はZを1にリセットする．
+
+(subsub-definition) (S-T-U)と置き換える．U=1,2,...である．Sはその時点での
+			(section)の値，Tはその時点での(sub-section)の値である．
+			次の(subsub-definition)が現れると次の値へ移行する．
+			新しい(sub-section)が現れた場合Uを1にリセットする
+(subsubsub-definition) (S-T-U-V)と置き換える．V=1,2,...である．Sはその時点での
+			(section)の値，Tはその時点での(sub-section)の値，Uはその時点での
+			(subsub-section)の値である．
+			次の(subsubsub-definition)が現れると次の値へ移行する．
+			新しい(subsub-section)が現れた場合Vを1にリセットする
+
+(reset) 上記すべての値をすべて初期状態に戻す．
+
+==で囲った値は他の章番号を参照している箇所である．
+現状はごく一部のみに存在するため手動で修正する．
+
+

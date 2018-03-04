@@ -1,0 +1,513 @@
+# -*- coding: utf-8 -*-
+#
+#   TOPPERS/SSP Kernel
+#       Toyohashi Open Platform for Embedded Real-Time Systems/
+#       Advanced Standard Profile Kernel
+#
+#   Copyright (C) 2015 by FUJI SOFT INCORPORATED, JAPAN
+#   Copyright (C) 2015,2016 by Embedded and Real-Time Systems Laboratory
+#               Graduate School of Information Science, Nagoya Univ., JAPAN
+#   Copyright (C) 2017 by Naoki Saito
+#               Nagoya Municipal Industrial Research Institute, JAPAN
+#   Copyright (C) 2017 by Meika Sugimoto
+#
+#   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
+#   ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
+#   変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
+#   (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+#       権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+#       スコード中に含まれていること．
+#   (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+#       用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+#       者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+#       の無保証規定を掲載すること．
+#   (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+#       用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+#       と．
+#     (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+#         作権表示，この利用条件および下記の無保証規定を掲載すること．
+#     (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
+#         報告すること．
+#   (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+#       害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+#       また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
+#       由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
+#       免責すること．
+#
+#   本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+#   よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
+#   に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
+#   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
+#   の責任を負わない．
+#
+#   $Id: kernel.trb 670 2016-03-03 15:08:11Z ertl-hiro $
+#
+
+#
+#		コンフィギュレータのパス2の生成スクリプト
+#
+
+#
+#  タイムスタンプファイルの指定
+#
+$timeStampFileName = "kernel_cfg.timestamp"
+
+#
+#  kernel_cfg.hの先頭部分の生成
+#
+$kernelCfgH = GenFile.new("kernel_cfg.h")
+$kernelCfgH.add(<<EOS)
+/* kernel_cfg.h */
+#ifndef TOPPERS_KERNEL_CFG_H
+#define TOPPERS_KERNEL_CFG_H
+EOS
+
+#
+#  kernel_cfg.cの先頭部分の生成
+#
+$kernelCfgC = GenFile.new("kernel_cfg.c")
+$kernelCfgC.add(<<EOS)
+/* kernel_cfg.c */
+#include "kernel/kernel_int.h"
+#include "kernel_cfg.h"
+
+#ifndef TOPPERS_EMPTY_LABEL
+#define TOPPERS_EMPTY_LABEL(x,y) x y[0]
+#endif
+EOS
+
+#
+#  インクルードディレクティブ（#include）
+#
+$kernelCfgC.comment_header("Include Directives")
+$includeFiles.each do |file|
+  $kernelCfgC.add("#include #{file}")
+end
+$kernelCfgC.add()
+
+#
+#  スタック領域の確保関数
+#
+#  スタック領域の定義分と，スタック領域のサイズ記述を配列で返す．
+#
+unless defined? AllocStack()
+  def AllocStack(stack, size)
+    # 大きい方に丸めたサイズで確保する
+    $kernelCfgC.add("static STK_T #{stack}[COUNT_STK_T(#{size})];")
+    return("ROUND_STK_T(#{size})")
+  end
+end
+
+#
+#  カーネルオブジェクトに関する情報の生成（仮想クラス）
+#
+class KernelObject
+  def initialize(obj, object)
+    @obj = obj
+    @OBJ = obj.tr("a-z", "A-Z")
+    @object = object
+    @objid = (obj + "id").to_sym
+    @api = "CRE_#{@OBJ}".to_sym
+  end
+
+  # オブジェクトのID番号のマクロ定義生成
+  def generateIdMacro()
+    $cfgData[@api].sort.each do |key, params|
+      $kernelCfgH.add("#define #{params[@objid]}\t#{params[@objid].val}")
+    end
+    $kernelCfgH.add()
+  end
+
+  def generate()
+    # kernel_cfg.hの生成
+    $kernelCfgH.add("#define TNUM_#{@OBJ}ID\t#{$cfgData[@api].size}")
+
+    # オブジェクトのID番号のマクロ定義の生成
+    generateIdMacro()
+
+    # オブジェクトのID番号を保持する変数
+    if $USE_EXTERNAL_ID
+      $cfgData[@api].sort.each do |key, params|
+        $kernelCfgC.add("const ID #{params[@objid]}_id" \
+                         " = #{params[@objid].val};")
+      end
+      $kernelCfgC.add()
+    end
+
+    # オブジェクトID番号の最大値
+    $kernelCfgC.add2("const ID _kernel_tmax_#{@obj}id" \
+                      " = (TMIN_#{@OBJ}ID + TNUM_#{@OBJ}ID - 1);")
+
+    # データ構造の生成
+    if respond_to?(:generateData)
+      generateData()
+    end
+
+    if $cfgData[@api].size() > 0
+      # オブジェクト初期化関数の追加
+      $initializeFunctions.push("_kernel_initialize_#{@object}();")
+    end
+  end
+end
+
+
+#
+#  通知ハンドラの生成関数
+#
+def generateNotifyHandler(key, params, objid)
+  # パラメータを変数に格納
+  nfymode = params[:nfymode]
+  nfymode1 = nfymode & 0x0f
+  nfymode2 = nfymode & ~0x0f
+  par1 = params[:par1]
+  par2 = params[:par2]
+
+  # 通知処理のパラメータ数による補正処理
+  if nfymode == $TNFY_HANDLER || nfymode1 == $TNFY_SETVAR \
+								|| nfymode1 == $TNFY_SETFLG \
+								|| nfymode1 == $TNFY_SNDDTQ
+    # 通知処理のパラメータが2つの場合
+	numpar = 2
+	epar1 = params[:par3]
+	epar2 = params[:par4]
+  else
+    # 通知処理のパラメータが1つの場合
+    numpar = 1
+    epar1 = params[:par2]
+    epar2 = params[:par3]
+  end
+
+  # パラメータ数のチェック
+  if (numpar == 2 && par2.nil?) || (nfymode2 != 0 && epar1.nil?) \
+								|| (nfymode2 == $TENFY_SETFLG && epar2.nil?)
+    # パラメータが足りない場合
+    error_api(params, "too few parameters for nfymode `#{nfymode}' " \
+											"in %apiname of %#{objid}")
+  elsif (nfymode2 == 0 && !epar1.nil?) \
+					|| (nfymode2 != $TENFY_SETFLG && !epar2.nil?)
+    # パラメータが多すぎる場合
+    printf "nfymode2 = %x , epar1 = %s  , epar2 = %s\n" , nfymode2 , epar1 , epar2
+    error_api(params, "too many parameters for nfymode `#{nfymode}' " \
+											"in %apiname of %#{objid}")
+  else
+    # 通知ハンドラの関数名
+    funcname = "_kernel_nfyhdr_#{params[objid]}"
+
+    # エラー通知のための変数のアドレスとオブジェクトIDを格納する
+    # 変数の生成（エラーチェックのために必要）
+    if nfymode2 == $TENFY_SETVAR || nfymode2 == $TENFY_INCVAR
+      $kernelCfgC.add2("intptr_t *const #{funcname}_p_evar =" \
+											" &#{epar1};")
+    elsif nfymode2 == $TENFY_ACTTSK
+      $kernelCfgC.add2("const ID #{funcname}_etskid = #{epar1};")
+    elsif nfymode2 == $TENFY_SIGSEM
+      $kernelCfgC.add2("const ID #{funcname}_esemid = #{epar1};")
+    elsif nfymode2 == $TENFY_SETFLG
+      $kernelCfgC.add2("const ID #{funcname}_eflgid = #{epar1};")
+    elsif nfymode2 == $TENFY_SNDDTQ
+      $kernelCfgC.add2("const ID #{funcname}_edtqid = #{epar1};")
+    end
+
+    # 関数の先頭部分の生成
+    $kernelCfgC.add("static void")
+    $kernelCfgC.add("#{funcname}(void)")
+    $kernelCfgC.add("{")
+
+    if nfymode2 == 0
+      # エラー通知がない場合
+      errorCode = "(void) "
+    else
+      # エラー通知がある場合
+      $kernelCfgC.add2("\tER\tercd;")
+      errorCode = "ercd = "
+    end
+
+    # イベント通知処理の処理
+    if nfymode1 == $TNFY_HANDLER
+      $kernelCfgC.add("\ttmevt_nfy_call_handler((TMEHDR)#{par2}, #{par1});")
+    elsif nfymode1 == $TNFY_SETVAR && nfymode2 == 0
+      # 変数の設定
+      $kernelCfgC.add("\ttmevt_nfy_setvar((intptr_t *) &#{par1}, #{par2});")
+    elsif nfymode1 == $TNFY_INCVAR && nfymode2 == 0
+      # 変数のインクリメント
+      $kernelCfgC.add("\ttmevt_nfy_incvar((intptr_t *) &#{par1});")
+    elsif nfymode1 == $TNFY_ACTTSK
+      # タスクの起動
+      $kernelCfgC.add("\t#{errorCode}tmevt_nfy_acttsk((ID) #{par1});")
+    elsif nfymode1 == $TNFY_SETFLG
+      # イベントフラグのセット
+      $kernelCfgC.add("\t#{errorCode}tmevt_nfy_setflg((ID) #{par1}, (FLGPTN) #{par2});")
+    elsif nfymode1 == $TNFY_SNDDTQ
+      # データキューへの送信
+      $kernelCfgC.add("\t#{errorCode}tmevt_nfy_snddtq((ID) #{par1}, #{par2});")
+    else
+      error_illegal_id("E_PAR", params, :nfymode, objid)
+    end
+
+    if nfymode2 != 0
+      # エラー通知処理の処理
+      $kernelCfgC.add("\tif (ercd != E_OK) {")
+
+
+      if nfymode2 == $TENFY_SETVAR
+        # 変数の設定
+        $kernelCfgC.add("\t\ttmevt_nfy_setvar(#{funcname}_p_evar, (intptr_t) ercd);")
+      elsif nfymode2 == $TENFY_INCVAR
+        # 変数のインクリメント
+        $kernelCfgC.add("\t\ttmevt_nfy_incvar(#{funcname}_p_evar);")
+      elsif nfymode2 == $TENFY_ACTTSK
+        # タスクの起動
+        $kernelCfgC.add("\t\t(void) tmevt_nfy_acttsk(#{funcname}_etskid);")
+      elsif nfymode2 == $TENFY_SETFLG
+        # イベントフラグのセット
+        $kernelCfgC.add("\t\t(void) tmevt_nfy_setflg(#{funcname}_eflgid, #{epar2});")
+      elsif nfymode2 == $TENFY_SNDDTQ
+        # データキューへの送信
+        $kernelCfgC.add("\t\t(void) tmevt_nfy_snddtq(#{funcname}_edtqid," \
+													" (intptr_t) ercd);")
+      else
+        error_illegal_id("E_PAR", params, :nfymode, objid)
+      end
+      $kernelCfgC.add("\t}")
+    end
+
+    # 関数の末尾部分の生成
+    $kernelCfgC.add2("}")
+  end
+  return(funcname)
+end
+
+#
+#  各機能モジュールのコンフィギュレーション
+#
+$initializeFunctions = []
+IncludeTrb("kernel/task.trb")
+IncludeTrb("extension/eventflag.trb")
+IncludeTrb("extension/dataqueue.trb")
+IncludeTrb("extension/cyclic.trb")
+IncludeTrb("extension/alarm.trb")
+IncludeTrb("kernel/interrupt.trb")
+IncludeTrb("kernel/exception.trb")
+
+#
+#  非タスクコンテキスト用のスタック領域
+#
+$kernelCfgC.comment_header("Stack Area for Non-task Context")
+
+# 非タスクコンテキスト用スタック領域のサイズ
+$istksz = 0
+
+# DEF_ICSのエントリが存在するか？
+if $cfgData[:DEF_ICS].size == 0
+  # ない場合，サイズは既定値(DEFAULT_ISTKSZ)を使う
+  $kernelCfgC.add2("#define TOPPERS_ISTKSZ	DEFAULT_ISTKSZ")
+  $istksz = $DEFAULT_ISTKSZ
+else
+  # DEF_ICS のエントリがある場合
+
+  # 静的API「DEF_ICS」が複数ある（E_OBJ）
+  if $cfgData[:DEF_ICS].size > 1
+    error("E_OBJ: too many DEF_ICS")
+  end
+
+  params = $cfgData[:DEF_ICS][1]
+
+  # istksz に 0 を指定した場合（E_PAR）
+  if params[:istksz] == 0
+    error_wrong("E_PAR", params, :istksz, "size is 0")
+  # istk は常に NULL である (E_PAR)
+  elsif params[:istk] != "NULL"
+    error_wrong("E_PAR", params, :istk, "must be NULL")
+  end
+
+  $istksz = params[:istksz]
+  $kernelCfgC.add2("#define TOPPERS_ISTKSZ\t(#{$istksz})")
+end
+
+#
+#  共有スタック領域
+#      SSPではすべての処理単位のスタックを共有するため，
+#      ここでシステム全体のスタック領域を確保する．
+#
+
+$kernelCfgC.comment_header("Stack Area for System")
+
+# 共有スタックのサイズ
+$stksz = 0
+
+stk_str = ""
+stksz_str = ""
+
+# DEF_STK のエントリが存在するか？
+if $cfgData[:DEF_STK].size == 0
+  # (1) DEF_STK のエントリがない場合
+  stk_str = "_kernel_stack"
+  stksz_str = AllocStack(stk_str, "TOPPERS_TSTKSZ+TOPPERS_ISTKSZ")
+
+  $stksz = $tstksz + $istksz
+else
+  # (2) DEF_STK のエントリがある場合
+
+  # 静的API「DEF_STK」が複数ある（E_OBJ）
+  if $cfgData[:DEF_STK].size > 1
+    error_exit("E_OBJ: too many DEF_STK")
+  end
+
+  params = $cfgData[:DEF_STK][1]
+
+  # DEF_STK の stksz で 0 を指定した場合(E_PAR)
+  if params[:stksz] == 0
+    error_exit("E_PAR: '#{params[:stksz]}' is not allowed in DEF_STK", \
+      "#{params[:_file_]}:#{params[:_line_]}:")
+  end
+
+  $stksz = params[:stksz]
+
+  if params[:stk] == "NULL"
+    # stk が NULL の場合，スタック領域を自動割付け
+    stk_str = "_kernel_stack"
+    stksz_str = AllocStack(stk_str, "#{$stksz}")
+  else
+    # stk が NULL 以外の場合（アプリ側でスタック領域を用意する場合）
+
+    # stksz がターゲット毎に定まるアライメントサイズの倍数にアライメントされていない場合（E_PAR）
+    if (defined? $CHECK_STKSZ_ALIGN) && (($stksz & ($CHECK_STKSZ_ALIGN - 1)) != 0)
+      error_exit("E_PAR: '#{params[:stksz]}' is not aligned in DEF_STK", \
+        "#{params[:_file_]}:#{params[:_line_]}:")
+
+    end
+
+    stk_str = params[:stk]
+    stksz_str = $stksz
+  end
+end
+
+#
+# 共有スタックのスタック領域
+#
+$kernelCfgC.add(<<EOS)
+#define TOPPERS_STK          (#{stk_str})
+#define TOPPERS_STKSZ        (#{stksz_str})
+
+const size_t\t_kernel_stksz = TOPPERS_STKSZ;
+STK_T *const\t_kernel_stk = TOPPERS_STK;
+
+#ifdef TOPPERS_ISTKPT
+STK_T *const\t_kernel_istkpt = TOPPERS_ISTKPT(TOPPERS_STK, TOPPERS_STKSZ);
+#endif /* TOPPERS_ISTKPT */
+EOS
+
+#
+#  優先度割り当ておよびスタック設定に関する結果を標準出力へ表示
+#  その際，スタックサイズの指定値が実際の割当てサイズより大きいかを確認する．
+#
+result_str = <<EOS
+=====================================
+Stack size configuration result:
+\tEstimated task stack size = #{$tstksz}
+\tSpecified interrupt stack size = #{$istksz}(value=#{sprintf("%d", $istksz)})
+\tAllocated total stack size = #{$stksz}(value=#{sprintf("%d", $stksz)})
+EOS
+
+puts result_str
+if $tstksz + $istksz > $stksz
+  print("\t!!!WARNING!!!: Estimated stack size is more than the allocated stack size.")
+  warning("Estimated stack size is more than the allocated stack size.")
+end
+puts "=====================================\n"
+
+#
+#  タイムイベント管理
+#
+
+tnum_tmevt = $cfgData[:CRE_CYC].size + $cfgData[:CRE_ALM].size
+if tnum_tmevt > 0
+$kernelCfgC.comment_header("Time Event Management")
+$kernelCfgC.add(<<EOS)
+#define TNUM_TMEVT #{sprintf("%d", tnum_tmevt)}
+
+const uint_t _kernel_tnum_tmevt_queue = TNUM_TMEVT;
+
+QUEUE _kernel_tmevt_queue[TNUM_TMEVT+1];
+EVTTIM _kernel_tmevt_time[TNUM_TMEVT];
+CBACK _kernel_tmevt_callback[TNUM_TMEVT];
+uintptr_t _kernel_tmevt_arg[TNUM_TMEVT];
+EOS
+
+  # オブジェクト初期化関数の追加
+  $initializeFunctions.unshift("_kernel_initialize_time_event();")
+
+end
+
+#
+#  各モジュールの初期化関数
+#
+$kernelCfgC.comment_header("Module Initialization Function")
+$kernelCfgC.append(<<EOS)
+void
+_kernel_initialize_object(void)
+{
+EOS
+$initializeFunctions.each do |func|
+  $kernelCfgC.add("\t#{func}")
+end
+$kernelCfgC.add2("}")
+
+#
+#  初期化ルーチン機能
+#
+$kernelCfgC.comment_header("Initialization Routine")
+
+# エラーチェック
+$cfgData[:ATT_INI].each do |key, params|
+  # iniatrが無効の場合（E_RSATR）
+  #（TA_NULLでない場合）
+  if (params[:iniatr] != $TA_NULL)
+    error_illegal_sym("E_RSATR", params, :iniatr, :inirtn)
+  end
+end
+
+# 初期化ルーチンの実行関数の生成
+$kernelCfgC.append(<<EOS)
+void
+_kernel_call_inirtn(void)
+{
+EOS
+$cfgData[:ATT_INI].each do |key, params|
+  $kernelCfgC.add("\t((INIRTN)(#{params[:inirtn]}))" \
+								"((intptr_t)(#{params[:exinf]}));")
+end
+$kernelCfgC.add2("}")
+
+#
+#  終了処理ルーチン機能
+#
+$kernelCfgC.comment_header("Termination Routine")
+
+# エラーチェック
+$cfgData[:ATT_TER].each do |key, params|
+  # teratrが無効の場合（E_RSATR）
+  #（TA_NULLでない場合）
+  if (params[:teratr] != $TA_NULL)
+    error_illegal_sym("E_RSATR", params, :teratr, :terrtn)
+  end
+end
+
+# 終了処理ルーチンの実行関数の生成
+$kernelCfgC.append(<<EOS)
+void
+_kernel_call_terrtn(void)
+{
+EOS
+$cfgData[:ATT_TER].reverse_each do |key, params|
+  $kernelCfgC.add("\t((TERRTN)(#{params[:terrtn]}))" \
+								"((intptr_t)(#{params[:exinf]}));")
+end
+$kernelCfgC.add2("}")
+
+#
+#  kernel_cfg.hの末尾部分の生成
+#
+$kernelCfgH.append(<<EOS)
+#endif /* TOPPERS_KERNEL_CFG_H */
+EOS

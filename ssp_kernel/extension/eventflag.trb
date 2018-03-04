@@ -1,0 +1,110 @@
+# -*- coding: utf-8 -*-
+#
+#   TOPPERS/SSP Kernel
+#       Toyohashi Open Platform for Embedded Real-Time Systems/
+#       Advanced Standard Profile Kernel
+# 
+#   Copyright (C) 2015 by FUJI SOFT INCORPORATED, JAPAN
+#   Copyright (C) 2015,2016 by Embedded and Real-Time Systems Laboratory
+#               Graduate School of Information Science, Nagoya Univ., JAPAN
+#   Copyright (C) 2017 by Naoki Saito
+#              Nagoya Municipal Industrial Research Institute, JAPAN
+# 
+#   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
+#   ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
+#   変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
+#   (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+#       権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+#       スコード中に含まれていること．
+#   (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+#       用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+#       者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+#       の無保証規定を掲載すること．
+#   (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+#       用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+#       と．
+#     (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+#         作権表示，この利用条件および下記の無保証規定を掲載すること．
+#     (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
+#         報告すること．
+#   (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+#       害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+#       また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
+#       由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
+#       免責すること．
+# 
+#   本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+#   よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
+#   に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
+#   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
+#   の責任を負わない．
+# 
+#   $Id: eventflag.trb 588 2016-02-05 12:54:58Z ertl-hiro $
+# 
+
+#
+#		イベントフラグ機能の生成スクリプト
+#
+
+class EventflagObject < KernelObject
+  def initialize()
+    super("flg", "eventflag")
+  end
+
+  def prepare()
+    $cfgData[@api].sort.each do |key, params|
+      # flgatrが無効の場合（E_RSATR）
+      #（TA_CLR以外のビットがセットされている場合）
+      if (params[:flgatr] & ~($TA_CLR)) != 0
+        error_illegal_id("E_RSATR", params, :flgatr, :flgid)
+      end
+
+      # iflgptnがFLGPTNに格納できない場合（E_PAR）
+      if (params[:iflgptn] & ~((1 << $TBIT_FLGPTN) - 1)) != 0
+        error_wrong_id("E_PAR", params, :iflgptn, :flgid, "too large")
+      end
+    end
+  end
+
+  def generateData()
+    #
+    #  オブジェクト初期化ブロックの生成
+    #
+    if $cfgData[:CRE_FLG].size() > 0
+      # 事前準備（エラーチェック，メモリ領域の生成）
+      prepare()
+
+      # イベントフラグ属性(flgatr)
+      $kernelCfgC.append("const ATR\t_kernel_flginib_atr[TNUM_FLGID] = {")
+      $cfgData[@api].each.with_index do |id, index|
+        flgatr = id[1][:flgatr]
+        $kernelCfgC.append(",") if index > 0
+        $kernelCfgC.append("(#{flgatr.str})")
+      end
+      $kernelCfgC.add("};")
+
+      # イベントフラグパターンの初期値(iflgptn)
+      $kernelCfgC.append("const FLGPTN\t_kernel_flginib_iflgptn[TNUM_FLGID] = {")
+      $cfgData[@api].each.with_index do |id, index|
+        $kernelCfgC.append(",") if index > 0 
+        $kernelCfgC.append("(#{id[1][:iflgptn].str})")
+      end 
+      $kernelCfgC.add("};")
+
+      # イベントフラグの現在のフラグパターンを格納する変数
+      $kernelCfgC.add2("FLGPTN\t_kernel_flgcb_flgptn[TNUM_FLGID];")
+
+    else
+      # オブジェクトが1つもない場合
+      $kernelCfgC.add("TOPPERS_EMPTY_LABEL(const ATR, _kernel_flginib_atr);") 
+      $kernelCfgC.add("TOPPERS_EMPTY_LABEL(const FLGPTN, _kernel_flginib_iflgptn);")
+      $kernelCfgC.add2("TOPPERS_EMPTY_LABEL(FLGPTN, _kernel_flgcb_flgptn);")
+    end
+  end
+end
+
+#
+#  イベントフラグに関する情報の生成
+#
+$kernelCfgC.comment_header("Eventflag Functions")
+EventflagObject.new.generate()

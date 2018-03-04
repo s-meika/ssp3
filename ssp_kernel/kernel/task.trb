@@ -1,0 +1,358 @@
+# -*- coding: utf-8 -*-
+#
+#   TOPPERS/SSP Kernel
+#       Toyohashi Open Platform for Embedded Real-Time Systems/
+#       Advanced Standard Profile Kernel
+# 
+#   Copyright (C) 2015 by FUJI SOFT INCORPORATED, JAPAN
+#   Copyright (C) 2015,2016 by Embedded and Real-Time Systems Laboratory
+#               Graduate School of Information Science, Nagoya Univ., JAPAN
+#   Copyright (C) 2017 by Naoki Saito
+#              Nagoya Municipal Industrial Research Institute, JAPAN
+# 
+#   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
+#   ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
+#   変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
+#   (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+#       権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+#       スコード中に含まれていること．
+#   (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+#       用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+#       者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+#       の無保証規定を掲載すること．
+#   (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+#       用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+#       と．
+#     (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+#         作権表示，この利用条件および下記の無保証規定を掲載すること．
+#     (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
+#         報告すること．
+#   (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+#       害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+#       また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
+#       由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
+#       免責すること．
+# 
+#   本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+#   よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
+#   に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
+#   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
+#   の責任を負わない．
+# 
+#   $Id: task.trb 668 2016-03-03 13:57:53Z ertl-hiro $
+# 
+
+#
+#		タスク管理モジュールの生成スクリプト
+#
+
+class TaskObject < KernelObject
+  def initialize()
+    super("tsk", "task")
+    @reallocate_atskpri = {}
+    @reallocate_etskpri = {}
+    @higher_pri_tsklist = {}
+    @stacksize_of_tasks = {}
+  end
+
+  # オブジェクトのID番号のマクロ定義の生成
+  def generateIdMacro()
+    # タスクIDを起動優先度(atskpri)の高い順に reallocate_atskpri へ割り当てて定義を kernel_cfg.h へ出力
+
+    ($cfgData[:CRE_TSK].sort_by {|e| e[1][:atskpri].val}).each.with_index(1) do |e, index|
+      @reallocate_atskpri[e[0]] = index 
+      $kernelCfgH.add("#define #{e[1][:tskid].str} #{index}")
+    end
+
+    $kernelCfgH.add()
+  end
+
+  #
+  #  指定したタスクに対するスタック使用量の最大を計算
+  #    引数：tskid：タスクID(内部表現．起動時優先度の内部表現に等しい)
+  #    返値：当該タスクに足しするスタック使用量の最大値．
+  #          この値は，当該タスクの実行開始から終了までの間に
+  #          そのタスクに対するプリエンプトを考慮してスタック使用量を
+  #          計算した場合に，可能性のある組み合わせの中で最大となる値を返す．
+  #
+  def calc_stksz(tskid, nest_level=1)
+    higher_pri_maxstksz = 0
+    calculated_stack_size = 0
+    stksz = 0
+    taskEntry = $cfgData[@api][tskid]
+
+    $kernelCfgC.add(" * " + ("\t" * nest_level) + "Calculation Start (Task ID = #{taskEntry[:tskid].str}, StackSize = #{taskEntry[:stksz]})")
+
+    if @stacksize_of_tasks[tskid]
+      # 計算が既に完了している場合，計算をスキップする
+      $kernelCfgC.add(" * " + ("\t" * nest_level) + "SKIP(max_stksz[#{taskEntry[:tskid].str}] = #{@stacksize_of_tasks[tskid]})")
+      stksz = @stacksize_of_tasks[tskid]
+    else
+      # 完了していない場合
+      $kernelCfgC.append(" * " + ("\t" * nest_level) + "Task list with higher priority than #{taskEntry[:tskid].str} = ")
+      @higher_pri_tsklist[tskid].each.with_index do |id, index|
+        $kernelCfgC.append(",") if index > 0
+        $kernelCfgC.append("(#{$cfgData[@api][id][:tskid].str})")
+      end
+      $kernelCfgC.add()
+
+      # 変数の初期化
+      higher_pri_maxstksz = 0
+
+      # 当該タスクID の実行時優先度より高い起動優先度を持つタスクが存在する場合
+      if @higher_pri_tsklist[tskid].size > 0
+        # それぞれの高優先度タスクに対し，スタック計算を実行する
+        @higher_pri_tsklist[tskid].each do |id|
+          calculated_stack_size = calc_stksz(id, nest_level+1)
+          # 最もサイズが大きいものだけを覚えておく
+          if higher_pri_maxstksz < calculated_stack_size
+            higher_pri_maxstksz = calculated_stack_size
+          end
+        end
+      end
+
+      $kernelCfgC.add(" * " + ("\t" * nest_level) + "higher_pri_maxstksz[#{taskEntry[:tskid].str}] = #{higher_pri_maxstksz}")
+
+      # 高優先度タスクのスタック使用量に，当該タスクの使用量を加算する
+      stksz = higher_pri_maxstksz + taskEntry[:stksz]
+
+      # 当該タスクIDに対して計算済みであることを記録
+      @stacksize_of_tasks[tskid] = stksz
+      $kernelCfgC.add(" * " + ("\t" * nest_level) + "DONE(stksz[#{taskEntry[:tskid].str}] = #{stksz})")
+    end
+
+    # 見積もりの最大を返す
+    return stksz
+  end
+
+  # 事前のチェック
+  def prepare()
+
+    $cfgData[@api].sort.each do |key, params|
+
+      # tskatrが無効（E_RSATR）
+      #（TA_ACT，TA_RSTR，TA_NULL，TARGET_TSKATR以外のビットがセットされている場合）
+      if (params[:tskatr] & ~($TA_ACT|$TA_RSTR|$TARGET_TSKATR)) != 0
+        error_illegal_id("E_RSATR", params, :tskatr, :tskid)
+      end
+
+      # (TMIN_TPRI <= atskpri && atskpri <= TMAX_TPRI)でない場合
+      if !($TMIN_TPRI <= params[:atskpri] && params[:atskpri] <= $TMAX_TPRI)
+        puts params
+        error_illegal_id("E_PAR", params, :atskpri, :tskid)
+      end
+
+      # atskpri が重複する場合 (E_PAR)
+      @reallocate_atskpri.each_key do |id|
+        if (params[:tskid].val != id) && (params[:atskpri] == $cfgData[@api][id][:atskpri])
+          error_illegal_id("E_PAR", params, :atskpri, :tskid)
+        end
+      end
+
+      # 実行時優先度
+      defepr_params = $cfgData[:DEF_EPR][params[:tskid].val]
+
+      if defepr_params
+        exepri = defepr_params[:exepri]
+
+        # exepri は TMIN_TPRI 以上 かつ TMAX_TPRI 以下(E_PAR)
+        if $TMIN_TPRI > exepri || $TMAX_TPRI < exepri
+	  error_exit("E_PAR: illegal exepri '#{exepri}' in DEF_EPR of #{params[:tskid]}", \
+		"#{defepr_params[:_file_]}:#{defepr_params[:_line_]}:")
+        end
+
+        # exepri は atskpri 以下の値をもつ(優先度が高い) (E_ILUSE)
+        if exepri > params[:atskpri]
+	  error_exit("E_ILUSE: illegal exepri '#{exepri}' in DEF_EPR of #{params[:tskid]}", \
+		"#{defepr_params[:_file_]}:#{defepr_params[:_line_]}:")
+        end
+      end
+
+      # stkszがターゲット定義の最小値（TARGET_MIN_STKSZ，未定義の場合は1）
+      # よりも小さい場合
+      if params[:stksz] < $TARGET_MIN_STKSZ
+        error_ercd("E_PAR", params, "stksz is too small.")
+      end
+
+      # スタックの先頭番地(stk)
+      # 全ての処理単位のスタックは共有される．
+      # そのため，スタックサイズに関するチェックは
+      # 共有スタック設定のところでまとめて行う．
+      if params[:stk] != "NULL"
+        error_ercd("E_PAR", params, "stk must be NULL.")
+      end
+    end
+  end
+
+  # データ構造の生成
+  def generateData()
+
+    # 事前準備（エラーチェック，メモリ領域の生成）
+    prepare()
+
+    #
+    # オブジェクト初期化ブロックの生成
+    #
+    init_rdypmap = 0
+
+    # タスク属性(tskatr)
+    $kernelCfgC.append("const ATR\t_kernel_tinib_tskatr[TNUM_TSKID] = {")
+    @reallocate_atskpri.each_key.with_index do |id, index|
+      tskatr = $cfgData[@api][id][:tskatr]
+      $kernelCfgC.append(",") if index > 0
+      $kernelCfgC.append("(#{tskatr.str})")
+      if tskatr & $TA_ACT != 0
+        init_rdypmap = init_rdypmap + (1 << index)
+      end
+    end
+    $kernelCfgC.add("};")
+
+    $kernelCfgC.add("const uint_t\t_kernel_init_rdypmap = #{init_rdypmap}U;")
+
+    # 拡張情報(exinf)
+    $kernelCfgC.append("const intptr_t\t_kernel_tinib_exinf[TNUM_TSKID] = {")
+    @reallocate_atskpri.each_key.with_index do |id, index|
+      exinf = $cfgData[@api][id][:exinf]
+      $kernelCfgC.append(",") if index > 0
+      $kernelCfgC.append("(intptr_t)(#{exinf})")
+    end
+    $kernelCfgC.add("};")
+
+    # 起動番地(task)
+    $kernelCfgC.append("const TASK\t_kernel_tinib_task[TNUM_TSKID] = {")
+    @reallocate_atskpri.each_key.with_index do |id, index|
+      task = $cfgData[@api][id][:task]
+      $kernelCfgC.append(",") if index > 0 
+      $kernelCfgC.append("(#{task})")
+    end 
+    $kernelCfgC.add("};")
+
+    # 実行時優先度(etskpri)
+    $kernelCfgC.append("const uint_t\t_kernel_tinib_epriority[TNUM_TSKID] = {")
+    @reallocate_atskpri.each_key.with_index do |id, index|
+      begin
+        # 実行時優先度がDEF_EPR で定義されていない場合，起動優先度の設定値を使う
+        defepr_entry = $cfgData[:DEF_EPR].find {|i| i[1][:tskid].val == $cfgData[@api][id][:tskid].val}
+        if defepr_entry
+          epri = defepr_entry[1][:exepri].val
+        else
+          epri = $cfgData[@api][id][:atskpri].val
+        end
+ 
+        @reallocate_atskpri.each_key do |id2|
+          if epri <= $cfgData[@api][id2][:atskpri]
+            $kernelCfgC.append(",") if index > 0
+            $kernelCfgC.append("INT_PRIORITY(#{@reallocate_atskpri[id2]})")
+            @reallocate_etskpri[id] = @reallocate_atskpri[id2]
+            break
+          end
+        end
+        raise "the exepri of #{$cfgData[@api][id][:tskid].str}  is invalid." if !@reallocate_etskpri[id]
+      rescue => e
+        error_exit(e.message + " Abort.")
+      end
+    end
+    $kernelCfgC.add("};")
+
+    #
+    # 優先度割り当て結果を出力
+    #
+    $kernelCfgC.add("/*")
+    $kernelCfgC.add(" * Configuration result of task priority:")
+    @reallocate_atskpri.each_key do |id|
+      $kernelCfgC.append(" * \t#{$cfgData[@api][id][:tskid]}:\tIPRI = #{@reallocate_atskpri[id]}")
+      $kernelCfgC.add(", EXEPRI = #{@reallocate_etskpri[id]}")
+    end
+    $kernelCfgC.add2(" */")
+
+    #
+    #  タスクの最大スタック使用量の計算
+    #
+    
+    # 木構造のデータ作成
+    $root_apri = []
+    (@reallocate_atskpri.sort_by {|id| id[1]}).reverse_each do |id|
+      # 各タスク毎に，その実行時優先度よりも高い起動時優先度をもつタスクのリストを作る
+      # それはプリエンプトされる可能性のあるタスクのリストとなる．
+      @higher_pri_tsklist[id[0]] = []
+      (@reallocate_atskpri.sort_by {|id| id[1]}).reverse_each do |id2|
+        if @reallocate_etskpri[id[0]] > id2[1]
+          @higher_pri_tsklist[id[0]].push(id2[0])
+        end
+      end
+    end
+
+    # プリエンプトする・される関係を示す木構造の根(root)となるタスクの探索
+    #   対象タスク(id)の起動時優先度(reallocate_atskpri[id]より低い
+    #   (値としては大きい)起動時優先度をもつタスクの higher_pri_tsklist に
+    #   対象タスク(id)が含まれなければ，根となる
+    (@reallocate_atskpri.sort_by {|id| id[1]}).reverse_each do |id|
+      $is_root = true
+      (@reallocate_atskpri.sort_by {|id| id[1]}).reverse_each do |id2|
+        if $is_root && (@reallocate_atskpri[id[0]] < @reallocate_atskpri[id2[0]])
+          if @higher_pri_tsklist[id2[0]].index(id[0])
+            $is_root = false
+          end
+        end
+      end
+      if $is_root
+        $root_apri.push(id)
+      end
+    end
+
+    #
+    #  出力開始 
+    #
+    $kernelCfgC.add("/* \n * Task Stack Size Estimation:")
+
+    # 根となるタスクに対し，その最大タスク使用量を計算し，リストへ追加する
+    $tstksz = 0
+    $stksz_estimated = []
+    $root_apri.each do |id|
+       $stksz_estimated.push(calc_stksz(id[1]))
+    end
+
+    # タスクのスタック使用量の最大値を決定
+    # リスト中の要素の最大値がタスクの最大スタック使用量となる．
+    $tstksz = 0
+    $stksz_estimated.each do |size|
+        if size > $tstksz
+                $tstksz = size
+        end
+    end
+
+    # 確認
+    $kernelCfgC.add2(<<EOS)
+ * List of Estimated Total Stack Sizes of Tasks = #{$stksz_estimated}
+ * Estimated Maximum Total Stack Size of Tasks = #{$tstksz}
+ */
+#define TOPPERS_TSTKSZ          (#{$tstksz})
+EOS
+
+    #
+    #  優先度割り当て結果を標準出力へ表示
+    #
+    puts <<~EOS
+      =====================================
+      Task priority configuration result: 
+    EOS
+    @reallocate_atskpri.each do |e|
+      puts "\t#{$cfgData[@api][e[0]][:tskid].str}:\tIPRI = #{e[1]}, EXEPRI = #{@reallocate_etskpri[e[0]]}\n"
+    end
+    puts "====================================="
+
+
+  end
+end
+
+#
+#  タスク管理に関する情報の生成
+#
+
+$kernelCfgC.comment_header("Task Management Functions")
+if $cfgData[:CRE_TSK].size() == 0
+  error("no task is registered")
+end
+
+TaskObject.new.generate()
+

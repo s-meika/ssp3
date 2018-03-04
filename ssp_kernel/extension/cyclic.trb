@@ -1,0 +1,154 @@
+# -*- coding: utf-8 -*-
+#
+#   TOPPERS/SSP Kernel
+#       Toyohashi Open Platform for Embedded Real-Time Systems/
+#       Advanced Standard Profile Kernel
+#
+#   Copyright (C) 2015 by FUJI SOFT INCORPORATED, JAPAN
+#   Copyright (C) 2015,2016 by Embedded and Real-Time Systems Laboratory
+#               Graduate School of Information Science, Nagoya Univ., JAPAN
+#   Copyright (C) 2017 by Naoki Saito
+#              Nagoya Municipal Industrial Research Institute, JAPAN
+#   Copyright (C) 2017 by Meika Sugimoto
+#
+#   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
+#   ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
+#   変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
+#   (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+#       権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+#       スコード中に含まれていること．
+#   (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+#       用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+#       者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+#       の無保証規定を掲載すること．
+#   (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+#       用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+#       と．
+#     (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+#         作権表示，この利用条件および下記の無保証規定を掲載すること．
+#     (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
+#         報告すること．
+#   (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+#       害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+#       また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
+#       由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
+#       免責すること．
+#
+#   本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+#   よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
+#   に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
+#   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
+#   の責任を負わない．
+#
+#   $Id: cyclic.trb 588 2016-02-05 12:54:58Z ertl-hiro $
+#
+
+#
+#		周期通知機能の生成スクリプト
+#
+
+class CyclicObject < KernelObject
+  def initialize()
+    super("cyc", "cyclic")
+  end
+
+  def prepare()
+    $cfgData[@api].sort.each do |key, params|
+
+      # cycatrが無効の場合（E_RSATR）
+      #（TA_STA以外のビットがセットされている場合）
+      if (params[:cycatr] & ~($TA_STA)) != 0
+        error_illegal_id("E_RSATR", params, :cycatr, :cycid)
+      end
+
+      # (0 < cyctim && cyctim <= TMAX_RELTIM)でない場合（E_PAR）
+      if !(0 < params[:cyctim] && params[:cyctim] <= $TMAX_RELTIM)
+        error_illegal_id("E_PAR", params, :cyctim, :cycid)
+      end
+
+      # (0 <= cycphs && cycphs <= TMAX_RELTIM)でない場合（E_PAR）
+      if !(0 <= params[:cycphs] && params[:cycphs] <= $TMAX_RELTIM)
+        error_illegal_id("E_PAR", params, :cycphs, :cycid)
+      end
+
+      # 位相が0かつ，属性が TA_STA の場合(警告)
+      if params[:cycphs] == 0 && (params[:cycatr] & $TA_STA) != 0
+        warning("cycphs==0 is not recommended when TA_STA is set to cycatr in CRE_CYC")
+      end
+
+      # 通知情報の処理
+      params[:nfyhdr] = generateNotifyHandler(key, params, :cycid)
+    end
+  end
+
+  def generateData()
+    if $cfgData[:CRE_CYC].size() > 0
+
+      # 事前準備（エラーチェック，メモリ領域の生成）
+      prepare()
+
+      # 周期ハンドラ属性(cycatr)
+      cycact = 0
+      $cfgData[@api].each.with_index do |id, index|
+        if (id[1][:cycatr] & $TA_STA != 0)
+          cycact = cycact | (1 << (id[0] - 1))
+        end
+      end
+      $kernelCfgC.add("const uint16_t\t_kernel_cycinib_cycact = #{cycact};")
+
+      # 周期ハンドラアドレス(cychdr)
+      $kernelCfgC.append("const NFYHDR\t_kernel_cycinib_nfyhdr[TNUM_CYCID] = {")
+      $cfgData[@api].each.with_index do |id, index|
+        $kernelCfgC.append(",") if index > 0
+        $kernelCfgC.append("(#{id[1][:nfyhdr]})")
+      end
+      $kernelCfgC.add("};")
+
+      # 周期ハンドラ周期(cyctim)
+      $kernelCfgC.append("const RELTIM\t_kernel_cycinib_cyctim[TNUM_CYCID] = {")
+      $cfgData[@api].each.with_index do |id, index|
+        $kernelCfgC.append(",") if index > 0
+        $kernelCfgC.append("(#{id[1][:cyctim]})")
+      end
+      $kernelCfgC.add("};")
+
+      # 周期ハンドラ位相(cycphs)
+      $kernelCfgC.append("const RELTIM\t_kernel_cycinib_cycphs[TNUM_CYCID] = {")
+      $cfgData[@api].each.with_index do |id, index|
+        $kernelCfgC.append(",") if index > 0
+        $kernelCfgC.append("(#{id[1][:cycphs]})")
+      end
+      $kernelCfgC.add("};")
+
+      # 周期ハンドラの次回起動時刻
+      $kernelCfgC.add("EVTTIM\t_kernel_cyccb_evttim[TNUM_CYCID];")
+    else
+      # オブジェクトが1つもない場合
+      $kernelCfgC.add("const uint16_t _kernel_cycinib_cycact = 0;")
+      $kernelCfgC.add("TOPPERS_EMPTY_LABEL(const intptr_t, _kernel_cycinib_exinf);")
+      $kernelCfgC.add("TOPPERS_EMPTY_LABEL(const NFYHDR, _kernel_cycinib_cychdr);") 
+      $kernelCfgC.add("TOPPERS_EMPTY_LABEL(const RELTIM, _kernel_cycinib_cyctim);")
+      $kernelCfgC.add("TOPPERS_EMPTY_LABEL(const RELTIM, _kernel_cycinib_cycphs);")
+      $kernelCfgC.add2("TOPPERS_EMPTY_LABEL(EVTTIM, _kernel_cyccb_evttim);")
+    end
+
+    # 周期ハンドラのタイムイベントIDオフセット
+    # 周期ハンドラのタイムイベントIDは0から開始
+    $kernelCfgC.add2("const uint_t _kernel_cycevtid_offset = 0;")
+
+    # 周期ハンドラの動作状態
+    $kernelCfgC.add2("uint16_t\t_kernel_cyccb_cycact;")
+  end
+end
+
+#
+#  周期通知に関する情報の生成
+#
+$kernelCfgC.comment_header("Cyclic Notification Functions")
+
+# エントリがTMAX_MAXCYC個(kernel.hで定義)より多い場合はエラーとする
+if $cfgData[:CRE_CYC].size() > $TMAX_MAXCYC
+  error("The number of CRE_CYC must be equal to or less than #{$TMAX_MAXCYC}")
+end
+
+CyclicObject.new.generate()

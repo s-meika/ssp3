@@ -1,0 +1,54 @@
+# -*- coding: utf-8 -*-
+# 
+#		パス3の生成スクリプトのコア依存部（ARM用）
+# 
+#  $Id: core_check.trb 730 2016-04-03 02:04:52Z ertl-hiro $
+#
+
+#
+#  ターゲット非依存部のインクルード
+#
+IncludeTrb("kernel/kernel_check.trb")
+
+#
+#  割込みハンドラテーブルに関するチェック
+#
+# DEF_INHで登録した割込みハンドラのみチェックする．逆に言うと，コンフィ
+# ギュレータで生成した割込みハンドラや，default_int_handlerのチェックは
+# 行わない．
+#
+inhinib_entry = SYMBOL("_kernel_inhinib_entry")
+$cfgData[:DEF_INH].each do |key, params|
+  inthdr = PEEK(inhinib_entry, $sizeof_FP)
+
+  #	割込みハンドラの先頭番地のチェック
+  if (inthdr & ($CHECK_FUNC_ALIGN - 1)) != 0
+    error_wrong_id("E_PAR", params, :inthdr, :inhno, "not aligned")
+  end
+  if $CHECK_FUNC_NONNULL && inthdr == 0
+    error_wrong_id("E_PAR", params, :inthdr, :inhno, "null")
+  end
+
+  inhinib_entry += $sizeof_FP
+end
+
+#
+#  CPU例外ハンドラテーブルに関するチェック
+#
+# DEF_EXCで登録したCPU例外ハンドラのみチェックする．逆に言うと，
+# default_exc_handlerのチェックは行わない．
+#
+excinib_entry = SYMBOL("_kernel_excinib_entry")
+$cfgData[:DEF_EXC].each do |key, params|
+  exchdr = PEEK(excinib_entry, $sizeof_FP)
+
+  # CPU例外ハンドラの先頭番地のチェック
+  if (exchdr & ($CHECK_FUNC_ALIGN - 1)) != 0
+    error_wrong_id("E_PAR", params, :exchdr, :excno, "not aligned")
+  end
+  if $CHECK_FUNC_NONNULL && exchdr == 0
+    error_wrong_id("E_PAR", params, :exchdr, :excno, "null")
+  end
+
+  excinib_entry += $sizeof_FP
+end

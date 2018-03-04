@@ -1,0 +1,15 @@
+CRE_TSK #tskid* { .tskatr &exinf &task +atskpri .stksz &stk }
+DEF_EPR %tskid* { +exepri }
+CRE_SEM #semid* { .sematr .isemcnt .maxsem }
+CRE_FLG #flgid* { .flgatr .iflgptn }
+CRE_DTQ #dtqid* { .dtqatr .dtqcnt &dtqmb }
+CRE_CYC #cycid* { .cycatr { .nfymode &par1 &par2? &par3? &par4? } .cyctim .cycphs }
+CRE_ALM #almid* { .almatr { .nfymode &par1 &par2? &par3? &par4? } }
+CFG_INT .intno* { .intatr +intpri }
+DEF_INH .inhno* { .inhatr &inthdr }
+DEF_EXC .excno* { .excatr &exchdr }
+DEF_ICS { .istksz &istk }
+DEF_STK { .stksz &stk }
+ATT_ISR { .isratr &exinf .intno &isr +isrpri }
+ATT_INI { .iniatr &exinf &inirtn }
+ATT_TER { .teratr &exinf &terrtn }
