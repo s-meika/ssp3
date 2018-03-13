@@ -60,7 +60,7 @@
 extern void _kernel_interrupt(const uint16_t inhno, void (*inthdr)(void));
 #define INT_ENTRY(inhno, inthdr)	inthdr
 #define INTHDR_ENTRY(inhno, intno, inthdr)	\
-void _kernel_inthdr ## inhno(void)	\
+void _kernel_prepare_interrupt_ ## intno(void)	\
 {											\
 	_kernel_interrupt(inhno, inthdr);		\
 }

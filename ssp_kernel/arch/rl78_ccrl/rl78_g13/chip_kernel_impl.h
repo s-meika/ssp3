@@ -132,7 +132,7 @@ enable_int(INTNO intno)
 	
 	assert(intno <= RL78_G13_INTNO_MAX);
 	
-	*(mask_reg->address) |= mask_reg->bitmask;
+	*(mask_reg->address) &= ~(mask_reg->bitmask);
 }
 
 /*
@@ -158,7 +158,7 @@ probe_int(INTNO intno)
 	
 	assert(intno <= RL78_G13_INTNO_MAX);
 	
-	return ((*(request_reg->address) &request_reg->bitmask) != 0);
+	return ((*(request_reg->address) & request_reg->bitmask) != 0);
 }
 
 
@@ -205,17 +205,17 @@ config_int(INTNO intno, ATR intatr, PRI intpri)
 	assert(intno <= RL78_G13_INTNO_MAX);
 	
 	/* Š„ž‚Ý—Dæ“x */
-	if(intpri == 1)
+	if(intpri == -1)
 	{
 		*(pri_reg1->address) |= pri_reg1->bitmask;
 		*(pri_reg2->address) &= ~(pri_reg2->bitmask);
 	}
-	else if(intpri == 2)
+	else if(intpri == -2)
 	{
 		*(pri_reg1->address) &= ~(pri_reg1->bitmask);
 		*(pri_reg2->address) |= pri_reg2->bitmask;
 	}
-	else if(intpri == 3)
+	else if(intpri == -3)
 	{
 		*(pri_reg1->address) |= pri_reg1->bitmask;
 		*(pri_reg2->address) |= pri_reg2->bitmask;

@@ -128,6 +128,8 @@ $kernelCfgC.add2("};")
 #  割込みハンドララッパ
 #
 #  ベクタテーブルには__near領域に配置しなければならないため，割込みハンドラのラッパーを生成する
+#    $kernelCfgC.add("\textern void #{$cfgData[:DEF_INH][inhno][:inthdr]}(void);")
+#    $kernelCfgC.add("\t#{$cfgData[:DEF_INH][inhno][:inthdr]}();")
 #
 
 $INTNO_VALID.each do |inhno|
@@ -135,8 +137,8 @@ $INTNO_VALID.each do |inhno|
     $kernelCfgC.add("__near void")
     $kernelCfgC.add("_kernel_inthdr_entry_#{inhno}(void)")
     $kernelCfgC.add("{")
-    $kernelCfgC.add("\textern void #{$cfgData[:DEF_INH][inhno][:inthdr]}(void);")
-    $kernelCfgC.add("\t#{$cfgData[:DEF_INH][inhno][:inthdr]}();")
+    $kernelCfgC.add("\textern void _kernel_prepare_interrupt_#{inhno}(void);")
+    $kernelCfgC.add("\t_kernel_prepare_interrupt_#{inhno}();")
     $kernelCfgC.add2("}")
   end
 end
@@ -163,6 +165,7 @@ $kernelCfgAsm.add(<<EOS)
 	.SECTION .vect , CONSTF
 vector_table:
 	.DB2 LOWW( _start )		; Reset Vector
+	.DB2 0x00				; Empty
 EOS
 
 
