@@ -53,13 +53,15 @@
  */
 #define PER0_ADDR			((uint8_t __far *)0xF00F0)	/* 周辺イネーブル・レジスタ 0 */
 #define TPS0_ADDR			((uint16_t __far *)0xF01B6)	/* タイマ・クロック選択レジスタ0 */
-#define TS0L_ADDR			((uint16_t __far *)0xF01B2)	/* タイマ・チャネル開始レジスタ0 */
-#define TT0L_ADDR			((uint16_t __far *)0xF01B4)	/* タイマ・チャネル停止レジスタ0 */
+#define TS0L_ADDR			((uint8_t __far *)0xF01B2)	/* タイマ・チャネル開始レジスタ0 */
+#define TT0L_ADDR			((uint8_t __far *)0xF01B4)	/* タイマ・チャネル停止レジスタ0 */
 
 /* タイマ・モードレジスタ0 */
 #define TMR0x_ADDR(x)		((uint16_t __far *)0xF0190 + (x))
 /* タイマ・データレジスタ */
-#define TDR0x_ADDR(x)	( x < 2 )? ((uint16_t __far *)0xFFF18 + (x)) : ((uint16_t __far *)0xFFF64 + (x))
+#define TDR0x_ADDR(x)	( x < 1 )? ((uint16_t __far *)0xFFF18) :	\
+						( x < 2 )? ((uint16_t __far *)0xFFF64) :	\
+						((uint16_t __far *)0xFFF68 + ((x - 4) / 2))
 /* タイマ・カウンタレジスタ */
 #define TCR0x_ADDR(x)		((uint16_t __far *)0xF0180 + (x))
 
@@ -100,7 +102,7 @@ void chip_hrt_timer_initialize(intptr_t exinf)
 	sil_wrh_mem( TPS0_ADDR , 0x0005U );
 
 	/* タイマ停止 */
-	sil_wrh_mem( TS0L_ADDR , 0x01U << TAU_NUMBER );
+	sil_wrb_mem( TT0L_ADDR , 0x01U << TAU_NUMBER );
 
 	/* タイマ設定 */
 	sil_wrh_mem( TDR0x_ADDR( TAU_NUMBER), TO_CLOCK(TIC_NUME, TIC_DENO) );
@@ -113,9 +115,8 @@ void chip_hrt_timer_initialize(intptr_t exinf)
 				| 0x0000U << 0U			/* MD:インターバル */
 			);
 
-
 	/* タイマ開始 */
-	sil_wrh_mem( TS0L_ADDR , 0x01U << TAU_NUMBER );
+	sil_wrb_mem( TS0L_ADDR , 0x01U << TAU_NUMBER );
 }
 
 /*
@@ -124,7 +125,7 @@ void chip_hrt_timer_initialize(intptr_t exinf)
 void chip_hrt_timer_terminate(intptr_t exinf)
 {
 	/* タイマ停止 */
-	sil_wrh_mem( TS0L_ADDR , 0x01U << TAU_NUMBER );
+	sil_wrb_mem( TS0L_ADDR , 0x01U << TAU_NUMBER );
 }
 
 /*

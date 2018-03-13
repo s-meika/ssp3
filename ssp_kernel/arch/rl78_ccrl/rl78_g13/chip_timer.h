@@ -45,7 +45,7 @@
  *
  *  w’è‚µ‚½”Ô†‚ÌTAU‚ğg—p‚·‚é
  */
-#define TAU_NUMBER	(6)
+#define TAU_NUMBER	(4)
 
 #ifndef TOPPERS_MACRO_ONLY
 
