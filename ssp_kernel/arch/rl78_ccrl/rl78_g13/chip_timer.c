@@ -132,6 +132,16 @@ void chip_hrt_timer_terminate(intptr_t exinf)
 	sil_wrb_mem( TS0L_ADDR , ((0x01U << TAU_NUMBER_MASTER) | (0x01U << TAU_NUMBER_SLAVE)));
 }
 
+
+/*
+ *  タイマの現在値の読出し
+ */
+HRTCNT chip_hrt_timer_get_current(void)
+{
+	return 0U;
+}
+
+
 /*
  *  高分解能タイマへの割込みタイミングの設定
  */

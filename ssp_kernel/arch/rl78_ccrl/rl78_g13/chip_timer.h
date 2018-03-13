@@ -44,8 +44,8 @@
 /*
  *  高分解能タイマ割込みハンドラ登録のための定数
  */
-#define INHNO_HRT		INTTM04			/* 割込みハンドラ番号 */
-#define INTNO_HRT		INTTM04			/* 割込み番号 */
+#define INHNO_HRT		INTTM05			/* 割込みハンドラ番号 */
+#define INTNO_HRT		INTTM05			/* 割込み番号 */
 #define INTATR_HRT		TA_NULL			/* 割込み属性 */
 
 /* 使用タイマ番号 */
@@ -100,7 +100,7 @@ extern void chip_hrt_set_event(HRTCNT hrtcnt);
 /*
  *  高分解能タイマ割込みの要求
  */
-extern void chip_hrt_raise_event(void);
+extern void target_hrt_raise_event(void);
 
 /*
  *  高分解能タイマ割込みハンドラ
