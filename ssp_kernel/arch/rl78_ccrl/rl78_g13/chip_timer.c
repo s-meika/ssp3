@@ -41,11 +41,6 @@
 #include "target_timer.h"
 #include "chip_timer.h"
 
-/* 使用タイマ番号 */
-#define TIMER_NO_MASTER		(HRT_TIMER_NO)
-#define TIMER_NO_SLAVE		(HRT_TIMER_NO + 1)
-
-
 /*
  *  レジスタアドレスの算出マクロ
  *
@@ -59,20 +54,19 @@
 /* タイマ・モードレジスタ0 */
 #define TMR0x_ADDR(x)		((uint16_t __far *)0xF0190 + (x))
 /* タイマ・データレジスタ */
-#define TDR0x_ADDR(x)	( x < 1 )? ((uint16_t __far *)0xFFF18) :	\
-						( x < 2 )? ((uint16_t __far *)0xFFF64) :	\
-						((uint16_t __far *)0xFFF68 + ((x - 4) / 2))
+#define TDR0x_ADDR(x)	( x < 2 )? ((uint16_t __far *)0xFFF18) :	\
+						((uint16_t __far *)0xFFF68 + ((x - 4)))
 /* タイマ・カウンタレジスタ */
 #define TCR0x_ADDR(x)		((uint16_t __far *)0xF0180 + (x))
 
 /* 割込み要求フラグレジスタ */
-#if ( TAU_NUMBER >= 0 ) && ( TAU_NUMBER <= 3 )
+#if ( TAU_NUMBER1 >= 0 ) && ( TAU_NUMBER1 <= 3 )
 #define IFx					((uint8_t __far *)0xFFFE2)		/* IF1L */
 #define IFx_bit				( 0x01U << ( TAU_NUMBER + 4 ) )
-#elif ( TAU_NUMBER == 4 )
+#elif ( TAU_NUMBER1 == 4 )
 #define IFx					((uint8_t*) __far 0xFFFE3)		/* IF1H */
 #define IFx_bit				( 0x01U << 7 ) )
-#elif ( TAU_NUMBER >= 5 ) && ( TAU_NUMBER <=7 )
+#elif ( TAU_NUMBER1 >= 5 ) && ( TAU_NUMBER1 <=7 )
 #define IFx					((uint8_t __far *)0xFFFD0)		/* IF2L */
 #define IFx_bit				( 0x01U << ( TAU_NUMBER - 5 ) )
 #else
@@ -102,11 +96,13 @@ void chip_hrt_timer_initialize(intptr_t exinf)
 	sil_wrh_mem( TPS0_ADDR , 0x0005U );
 
 	/* タイマ停止 */
-	sil_wrb_mem( TT0L_ADDR , 0x01U << TAU_NUMBER );
+	sil_wrb_mem( TT0L_ADDR , ((0x01U << TAU_NUMBER_MASTER) | (0x01U << TAU_NUMBER_SLAVE)));
 
 	/* タイマ設定 */
-	sil_wrh_mem( TDR0x_ADDR( TAU_NUMBER), TO_CLOCK(TIC_NUME, TIC_DENO) );
-	sil_wrh_mem( TMR0x_ADDR( TAU_NUMBER) ,
+	sil_wrh_mem( TDR0x_ADDR( TAU_NUMBER_MASTER), 32U );
+	sil_wrh_mem( TDR0x_ADDR( TAU_NUMBER_SLAVE), TCYC_HRTCNT );
+	
+	sil_wrh_mem( TMR0x_ADDR( TAU_NUMBER_MASTER) ,
 				0x0000U   << 14U		/* CKS:CK00 */
 				| 0x0000U << 12U		/* CCS:CKSで指定したクロック */
 				| 0x0001U << 11U		/* MASTER:マスター動作 */
@@ -114,9 +110,17 @@ void chip_hrt_timer_initialize(intptr_t exinf)
 				| 0x0000U << 6U 		/* CIS:Don't care */
 				| 0x0000U << 0U			/* MD:インターバル */
 			);
+	sil_wrh_mem( TMR0x_ADDR( TAU_NUMBER_SLAVE) ,
+				0x0000U   << 14U		/* CKS:CK00 */
+				| 0x0000U << 12U		/* CCS:CKSで指定したクロック */
+				| 0x0000U << 11U		/* MASTER:スレーブ動作 */
+				| 0x0004U << 8U 		/* STS:INTnmトリガ */
+				| 0x0000U << 6U 		/* CIS:Don't care */
+				| 0x0000U << 0U			/* MD:インターバル */
+			);
 
 	/* タイマ開始 */
-	sil_wrb_mem( TS0L_ADDR , 0x01U << TAU_NUMBER );
+	sil_wrb_mem( TS0L_ADDR , ((0x01U << TAU_NUMBER_MASTER) | (0x01U << TAU_NUMBER_SLAVE)));
 }
 
 /*
@@ -125,7 +129,7 @@ void chip_hrt_timer_initialize(intptr_t exinf)
 void chip_hrt_timer_terminate(intptr_t exinf)
 {
 	/* タイマ停止 */
-	sil_wrb_mem( TS0L_ADDR , 0x01U << TAU_NUMBER );
+	sil_wrb_mem( TS0L_ADDR , ((0x01U << TAU_NUMBER_MASTER) | (0x01U << TAU_NUMBER_SLAVE)));
 }
 
 /*

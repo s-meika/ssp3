@@ -40,12 +40,18 @@
 
 #include "kernel_impl.h"
 
+
 /*
- *  使用するタイマ番号
- *
- *  指定した番号のTAUを使用する
+ *  高分解能タイマ割込みハンドラ登録のための定数
  */
-#define TAU_NUMBER	(4)
+#define INHNO_HRT		INTTM04			/* 割込みハンドラ番号 */
+#define INTNO_HRT		INTTM04			/* 割込み番号 */
+#define INTATR_HRT		TA_NULL			/* 割込み属性 */
+
+/* 使用タイマ番号 */
+#define TAU_NUMBER_MASTER	(4)
+#define TAU_NUMBER_SLAVE	(5)
+
 
 #ifndef TOPPERS_MACRO_ONLY
 

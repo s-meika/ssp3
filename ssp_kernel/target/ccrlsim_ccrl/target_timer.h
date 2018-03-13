@@ -57,12 +57,7 @@
  */
 #define INTPRI_HRT    (-1) 				/* 割込み優先度 */
 
-/*
- *  高分解能タイマ割込みハンドラ登録のための定数
- */
-#define INHNO_HRT		INTTM07			/* 割込みハンドラ番号 */
-#define INTNO_HRT		INTTM07			/* 割込み番号 */
-#define INTATR_HRT		TA_NULL			/* 割込み属性 */
+
 /*
  *  プロセッサ依存部で定義する
  */

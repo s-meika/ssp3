@@ -62,18 +62,6 @@
 #define TOPPERS_TARGET_SUPPORT_CLR_INT		/* clr_int */
 
 /*
- *  高分解能タイマのタイマ周期
- *
- *  タイマ周期が2^32の場合には，このマクロを定義しない．
- */
-#undef TCYC_HRTCNT
-
-/*
- *  高分解能タイマのカウント値の進み幅
- */
-#define TSTEP_HRTCNT	1U
-
-/*
  *  割込み優先度の範囲
  */
 #define TMIN_INTPRI		(-3)		/* 割込み優先度の最小値（最高値）*/
