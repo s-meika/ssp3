@@ -84,7 +84,7 @@ sil_reb_mem(const uint8_t __far *mem)
 Inline void
 sil_wrb_mem(uint8_t __far *mem, uint8_t data)
 {
-	*((volatile uint8_t *) mem) = data;
+	*((volatile __far uint8_t *) mem) = data;
 }
 
 /*
@@ -96,14 +96,14 @@ sil_reh_mem(const __far uint16_t *mem)
 {
 	uint16_t	data;
 
-	data = *((const volatile uint16_t *) mem);
+	data = *((const volatile __far uint16_t *) mem);
 	return(data);
 }
 
 Inline void
 sil_wrh_mem(uint16_t __far *mem, uint16_t data)
 {
-	*((volatile uint16_t *) mem) = data;
+	*((volatile __far uint16_t *) mem) = data;
 }
 
 /*
@@ -115,13 +115,13 @@ sil_rew_mem(const __far uint32_t *mem)
 {
 	uint32_t	data;
 
-	data = *((const volatile uint32_t *) mem);
+	data = *((const volatile __far uint32_t *) mem);
 	return(data);
 }
 
 Inline void
 sil_wrw_mem(uint32_t __far *mem, uint32_t data)
 {
-	*((volatile uint32_t *) mem) = data;
+	*((volatile __far uint32_t *) mem) = data;
 }
 #endif /* TOPPERS_PRC_SIL_H */
