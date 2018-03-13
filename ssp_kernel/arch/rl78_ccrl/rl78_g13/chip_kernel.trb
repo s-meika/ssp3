@@ -125,26 +125,6 @@ end
 $kernelCfgC.add2("};")
 
 #
-#  割込みハンドララッパ
-#
-#  ベクタテーブルには__near領域に配置しなければならないため，割込みハンドラのラッパーを生成する
-#    $kernelCfgC.add("\textern void #{$cfgData[:DEF_INH][inhno][:inthdr]}(void);")
-#    $kernelCfgC.add("\t#{$cfgData[:DEF_INH][inhno][:inthdr]}();")
-#
-
-$INTNO_VALID.each do |inhno|
-  if ($cfgData[:DEF_INH].has_key?(inhno)) && ($cfgData[:CFG_INT][inhno][:intpri] < $TIPM_LOCK)
-    $kernelCfgC.add("__near void")
-    $kernelCfgC.add("_kernel_inthdr_entry_#{inhno}(void)")
-    $kernelCfgC.add("{")
-    $kernelCfgC.add("\textern void _kernel_prepare_interrupt_#{inhno}(void);")
-    $kernelCfgC.add("\t_kernel_prepare_interrupt_#{inhno}();")
-    $kernelCfgC.add2("}")
-  end
-end
-
-
-#
 #  kernel_cfg_support.asmの先頭部分の生成
 #
 $kernelCfgAsm = GenFile.new("kernel_cfg_support.asm")
@@ -155,8 +135,8 @@ $kernelCfgAsm.add(<<EOS)
 ;  kernel_cfg.cのアセンブラ記述部
 ;
 
-	.extern _start
-	.public vector_table
+	.EXTERN _start
+	.PUBLIC vector_table
 
 ;
 ;  Vector Table
@@ -175,7 +155,7 @@ EOS
 
 $INTNO_VALID.each do |inhno|
   if ($cfgData[:DEF_INH].has_key?(inhno)) && ($cfgData[:CFG_INT][inhno][:intpri] < $TIPM_LOCK)
-    $kernelCfgAsm.append("\t.DB2 LOWW( __kernel_inthdr_entry_#{inhno} )")
+    $kernelCfgAsm.append("\t.DB2 LOWW( _kernel_inthdr_entry_#{inhno} )")
     $kernelCfgAsm.add("\t; #{inhno}")
   else
     $kernelCfgAsm.append("\t.DB2 LOWW( __kernel_unused_interrupt )")
@@ -183,4 +163,36 @@ $INTNO_VALID.each do |inhno|
  end
 end
 
+$kernelCfgAsm = GenFile.new("kernel_cfg_support.asm")
+$kernelCfgAsm.add(<<EOS)
+
+;
+;  割込み入り口エントリ
+;
+
+	.section .text, TEXT
+
+	.EXTERN __kernel_interrupt
+EOS
+
+#
+#  割込み入り口エントリの生成
+#
+$cfgData[:DEF_INH].each.with_index do |(key, params), index|
+	$kernelCfgAsm.add("\t.PUBLIC _kernel_inthdr_entry_#{params[:inhno].val}");
+	$kernelCfgAsm.add("\t.EXTERN _#{params[:inthdr]}");
+	$kernelCfgAsm.add("_kernel_inthdr_entry_#{params[:inhno].val}:");
+	$kernelCfgAsm.add("\tPUSH AX")
+	$kernelCfgAsm.add("\tPUSH BC")
+	$kernelCfgAsm.add("\tPUSH DE")
+	$kernelCfgAsm.add("\tPUSH HL")
+	$kernelCfgAsm.add("\tMOV A, ES")
+	$kernelCfgAsm.add("\tPUSH AX")
+	$kernelCfgAsm.add("\tMOV A, CS")
+	$kernelCfgAsm.add("\tPUSH AX")
+	$kernelCfgAsm.add("\tMOV CS, #HIGHW(_#{params[:inthdr]})")
+	$kernelCfgAsm.add("\tMOVW HL, #LOWW(_#{params[:inthdr]})")
+	$kernelCfgAsm.add("\tBR !!__kernel_interrupt")
+	$kernelCfgAsm.add("")
+end
 
