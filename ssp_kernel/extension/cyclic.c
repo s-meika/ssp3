@@ -102,7 +102,7 @@ initialize_cyclic(void)
 		
 		/* 周期ハンドラの初期起動 */
 		if((cycinib_cycact & CYCACT_BIT(i)) != 0U) {
-			time_event_enqueue(CYC_EVTID(i) ,
+			time_event_register(CYC_EVTID(i) ,
 				(EVTTIM)cycinib_cycphs[i] , call_cychdr , i);
 			cyccb_evttim[i] = cycinib_cycphs[i];
 		}
@@ -133,10 +133,9 @@ sta_cyc(ID cycid)
 		cyccb_cycact |= CYCACT_BIT(index);
 	}
 
-	evttim = current_time + cycinib_cycphs[index];
 	time_event_enqueue(CYC_EVTID(index) ,
-		 evttim , call_cychdr , index);
-	cyccb_evttim[index] = evttim;
+		 cycinib_cycphs[index] , call_cychdr , index);
+	cyccb_evttim[index] = cycinib_cycphs[index];
 	
 	ercd = E_OK;
 	unlock_cpu();
@@ -185,7 +184,7 @@ call_cychdr(uintptr_t cycidx)
 	cyccb_evttim[cycidx] += cycinib_cyctim[cycidx];
 
 	/* 次周期のタイムイベントを登録 */
-	time_event_enqueue((ID)cycidx ,
+	time_event_register((ID)cycidx ,
 		cyccb_evttim[cycidx] , call_cychdr , cycidx);
 	
 	unlock_cpu();
