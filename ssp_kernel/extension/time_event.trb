@@ -1,0 +1,80 @@
+# -*- coding: utf-8 -*-
+#
+#   TOPPERS/SSP Kernel
+#       Toyohashi Open Platform for Embedded Real-Time Systems/
+#       Advanced Standard Profile Kernel
+#
+#   Copyright (C) 2017 by Meika Sugimoto
+#
+#   上記著作権者は，以下の(1)〜(4)の条件を満たす場合に限り，本ソフトウェ
+#   ア（本ソフトウェアを改変したものを含む．以下同じ）を使用・複製・改
+#   変・再配布（以下，利用と呼ぶ）することを無償で許諾する．
+#   (1) 本ソフトウェアをソースコードの形で利用する場合には，上記の著作
+#       権表示，この利用条件および下記の無保証規定が，そのままの形でソー
+#       スコード中に含まれていること．
+#   (2) 本ソフトウェアを，ライブラリ形式など，他のソフトウェア開発に使
+#       用できる形で再配布する場合には，再配布に伴うドキュメント（利用
+#       者マニュアルなど）に，上記の著作権表示，この利用条件および下記
+#       の無保証規定を掲載すること．
+#   (3) 本ソフトウェアを，機器に組み込むなど，他のソフトウェア開発に使
+#       用できない形で再配布する場合には，次のいずれかの条件を満たすこ
+#       と．
+#     (a) 再配布に伴うドキュメント（利用者マニュアルなど）に，上記の著
+#         作権表示，この利用条件および下記の無保証規定を掲載すること．
+#     (b) 再配布の形態を，別に定める方法によって，TOPPERSプロジェクトに
+#         報告すること．
+#   (4) 本ソフトウェアの利用により直接的または間接的に生じるいかなる損
+#       害からも，上記著作権者およびTOPPERSプロジェクトを免責すること．
+#       また，本ソフトウェアのユーザまたはエンドユーザからのいかなる理
+#       由に基づく請求からも，上記著作権者およびTOPPERSプロジェクトを
+#       免責すること．
+#
+#   本ソフトウェアは，無保証で提供されているものである．上記著作権者お
+#   よびTOPPERSプロジェクトは，本ソフトウェアに関して，特定の使用目的
+#   に対する適合性も含めて，いかなる保証も行わない．また，本ソフトウェ
+#   アの利用により直接的または間接的に生じたいかなる損害に関しても，そ
+#   の責任を負わない．
+#
+#
+
+#
+#		タイムイベント機能の生成スクリプト
+#
+
+#
+#  タイムイベントに関する情報の生成
+#
+$kernelCfgC.comment_header("Time Event Management Functions")
+
+tnum_tmevt = $cfgData[:CRE_CYC].size() + $cfgData[:CRE_ALM].size()
+$kernelCfgC.add("")
+
+$kernelCfgC.add("#define TNUM_TMEVT #{tnum_tmevt}")
+$kernelCfgC.add("")
+
+# タイムイベントブロックのサイズ
+$kernelCfgC.add("const uint_t _kernel_tnum_tmevt_queue = TNUM_TMEVT;");
+$kernelCfgC.add("")
+
+if tnum_tmevt != 0
+	# タイムイベントキュー
+	$kernelCfgC.add("QUEUE _kernel_tmevt_queue[TNUM_TMEVT+1];")
+	# タイムイベント時間
+	$kernelCfgC.add("EVTTIM _kernel_tmevt_time[TNUM_TMEVT];")
+	# タイムイベントのコールバック
+	$kernelCfgC.add("CBACK _kernel_tmevt_callback[TNUM_TMEVT];")
+	# タイムイベントコールバックの引数
+	$kernelCfgC.add("uintptr_t _kernel_tmevt_arg[TNUM_TMEVT];")
+	$kernelCfgC.add("")
+	$kernelCfgC.add("")
+	$initializeFunctions.unshift("_kernel_initialize_time_event();")
+else
+	$kernelCfgC.add("TOPPERS_EMPTY_LABEL(QUEUE, _kernel_tmevt_queue);")
+	$kernelCfgC.add("TOPPERS_EMPTY_LABEL(EVTTIM, _kernel_tmevt_time);")
+	$kernelCfgC.add("TOPPERS_EMPTY_LABEL(CBACK, _kernel_tmevt_callback);")
+	$kernelCfgC.add("TOPPERS_EMPTY_LABEL(uintptr_t, _kernel_tmevt_arg);")
+	$kernelCfgC.add("")
+	$kernelCfgC.add("")
+end
+
+

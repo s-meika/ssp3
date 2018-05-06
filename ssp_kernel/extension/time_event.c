@@ -1,162 +1,361 @@
 /*
- *  TOPPERS/SSP Kernel
- *      Smallest Set Profile Kernel
- *
- *  Copyright (C) 2011 by Meika Sugimoto
+ *  TOPPERS/ASP Kernel
+ *      Toyohashi Open Platform for Embedded Real-Time Systems/
+ *      Advanced Standard Profile Kernel
  * 
- *  ã‹L’˜ìŒ Ò‚ÍCˆÈ‰º‚Ì (1)`(4) ‚ÌğŒ‚ğ–‚½‚·ê‡‚ÉŒÀ‚èC–{ƒ\ƒtƒgƒEƒF
- *  ƒAi–{ƒ\ƒtƒgƒEƒFƒA‚ğ‰ü•Ï‚µ‚½‚à‚Ì‚ğŠÜ‚ŞDˆÈ‰º“¯‚¶j‚ğg—pE•¡»E‰ü•ÏE
- *  Ä”z•ziˆÈ‰ºC—˜—p‚ÆŒÄ‚Ôj‚·‚é‚±‚Æ‚ğ–³‚Å‹–‘ø‚·‚éD
- *  (1) –{ƒ\ƒtƒgƒEƒFƒA‚ğƒ\[ƒXƒR[ƒh‚ÌŒ`‚Å—˜—p‚·‚éê‡‚É‚ÍCã‹L‚Ì’˜ìŒ 
- *      •\¦C‚±‚Ì—˜—pğŒ‚¨‚æ‚Ñ‰º‹L‚Ì–³•ÛØ‹K’è‚ªC‚»‚Ì‚Ü‚Ü‚ÌŒ`‚Åƒ\[ƒX
- *      ƒR[ƒh’†‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚é‚±‚ÆD
- *  (2) –{ƒ\ƒtƒgƒEƒFƒA‚ğCƒ‰ƒCƒuƒ‰ƒŠŒ`®‚È‚ÇC‘¼‚Ìƒ\ƒtƒgƒEƒFƒAŠJ”­‚Ég—p
- *      ‚Å‚«‚éŒ`‚ÅÄ”z•z‚·‚éê‡‚É‚ÍCÄ”z•z‚É”º‚¤ƒhƒLƒ…ƒƒ“ƒgi—˜—pÒƒ}
- *      ƒjƒ…ƒAƒ‹‚È‚Çj‚ÉCã‹L‚Ì’˜ìŒ •\¦C‚±‚Ì—˜—pğŒ‚¨‚æ‚Ñ‰º‹L‚Ì–³•Û
- *      Ø‹K’è‚ğŒfÚ‚·‚é‚±‚ÆD
- *  (3) –{ƒ\ƒtƒgƒEƒFƒA‚ğC‹@Ší‚É‘g‚İ‚Ş‚È‚ÇC‘¼‚Ìƒ\ƒtƒgƒEƒFƒAŠJ”­‚Ég—p
- *      ‚Å‚«‚È‚¢Œ`‚ÅÄ”z•z‚·‚éê‡‚É‚ÍCŸ‚Ì‚¢‚¸‚ê‚©‚ÌğŒ‚ğ–‚½‚·‚±‚ÆD
- *    (a) Ä”z•z‚É”º‚¤ƒhƒLƒ…ƒƒ“ƒgi—˜—pÒƒ}ƒjƒ…ƒAƒ‹‚È‚Çj‚ÉCã‹L‚Ì’˜ì
- *        Œ •\¦C‚±‚Ì—˜—pğŒ‚¨‚æ‚Ñ‰º‹L‚Ì–³•ÛØ‹K’è‚ğŒfÚ‚·‚é‚±‚ÆD
- *    (b) Ä”z•z‚ÌŒ`‘Ô‚ğC•Ê‚É’è‚ß‚é•û–@‚É‚æ‚Á‚ÄCTOPPERSƒvƒƒWƒFƒNƒg‚É•ñ
- *        ‚·‚é‚±‚ÆD
- *  (4) –{ƒ\ƒtƒgƒEƒFƒA‚Ì—˜—p‚É‚æ‚è’¼Ú“I‚Ü‚½‚ÍŠÔÚ“I‚É¶‚¶‚é‚¢‚©‚È‚é‘¹ŠQ
- *      ‚©‚ç‚àCã‹L’˜ìŒ Ò‚¨‚æ‚ÑTOPPERSƒvƒƒWƒFƒNƒg‚ğ–ÆÓ‚·‚é‚±‚ÆD‚Ü‚½C
- *      –{ƒ\ƒtƒgƒEƒFƒA‚Ìƒ†[ƒU‚Ü‚½‚ÍƒGƒ“ƒhƒ†[ƒU‚©‚ç‚Ì‚¢‚©‚È‚é——R‚ÉŠî‚Ã
- *      ‚­¿‹‚©‚ç‚àCã‹L’˜ìŒ Ò‚¨‚æ‚ÑTOPPERSƒvƒƒWƒFƒNƒg‚ğ–ÆÓ‚·‚é‚±‚ÆD
+ *  Copyright (C) 2000-2003 by Embedded and Real-Time Systems Laboratory
+ *                              Toyohashi Univ. of Technology, JAPAN
+ *  Copyright (C) 2005-2016 by Embedded and Real-Time Systems Laboratory
+ *              Graduate School of Information Science, Nagoya Univ., JAPAN
  * 
- *  –{ƒ\ƒtƒgƒEƒFƒA‚ÍC–³•ÛØ‚Å’ñ‹Ÿ‚³‚ê‚Ä‚¢‚é‚à‚Ì‚Å‚ ‚éDã‹L’˜ìŒ Ò‚¨‚æ
- *  ‚ÑTOPPERSƒvƒƒWƒFƒNƒg‚ÍC–{ƒ\ƒtƒgƒEƒFƒA‚ÉŠÖ‚µ‚ÄC“Á’è‚Ìg—p–Ú“I‚É‘Î‚·
- *  ‚é“K‡«‚àŠÜ‚ß‚ÄC‚¢‚©‚È‚é•ÛØ‚às‚í‚È‚¢D‚Ü‚½C–{ƒ\ƒtƒgƒEƒFƒA‚Ì—˜—p
- *  ‚É‚æ‚è’¼Ú“I‚Ü‚½‚ÍŠÔÚ“I‚É¶‚¶‚½‚¢‚©‚È‚é‘¹ŠQ‚ÉŠÖ‚µ‚Ä‚àC‚»‚ÌÓ”C‚ğ•‰
- *  ‚í‚È‚¢D
+ *  ä¸Šè¨˜è‘—ä½œæ¨©è€…ã¯ï¼Œä»¥ä¸‹ã®(1)ã€œ(4)ã®æ¡ä»¶ã‚’æº€ãŸã™å ´åˆã«é™ã‚Šï¼Œæœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§
+ *  ã‚¢ï¼ˆæœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚’æ”¹å¤‰ã—ãŸã‚‚ã®ã‚’å«ã‚€ï¼ä»¥ä¸‹åŒã˜ï¼‰ã‚’ä½¿ç”¨ãƒ»è¤‡è£½ãƒ»æ”¹
+ *  å¤‰ãƒ»å†é…å¸ƒï¼ˆä»¥ä¸‹ï¼Œåˆ©ç”¨ã¨å‘¼ã¶ï¼‰ã™ã‚‹ã“ã¨ã‚’ç„¡å„Ÿã§è¨±è«¾ã™ã‚‹ï¼
+ *  (1) æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚’ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ã®å½¢ã§åˆ©ç”¨ã™ã‚‹å ´åˆã«ã¯ï¼Œä¸Šè¨˜ã®è‘—ä½œ
+ *      æ¨©è¡¨ç¤ºï¼Œã“ã®åˆ©ç”¨æ¡ä»¶ãŠã‚ˆã³ä¸‹è¨˜ã®ç„¡ä¿è¨¼è¦å®šãŒï¼Œãã®ã¾ã¾ã®å½¢ã§ã‚½ãƒ¼
+ *      ã‚¹ã‚³ãƒ¼ãƒ‰ä¸­ã«å«ã¾ã‚Œã¦ã„ã‚‹ã“ã¨ï¼
+ *  (2) æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚’ï¼Œãƒ©ã‚¤ãƒ–ãƒ©ãƒªå½¢å¼ãªã©ï¼Œä»–ã®ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢é–‹ç™ºã«ä½¿
+ *      ç”¨ã§ãã‚‹å½¢ã§å†é…å¸ƒã™ã‚‹å ´åˆã«ã¯ï¼Œå†é…å¸ƒã«ä¼´ã†ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆï¼ˆåˆ©ç”¨
+ *      è€…ãƒãƒ‹ãƒ¥ã‚¢ãƒ«ãªã©ï¼‰ã«ï¼Œä¸Šè¨˜ã®è‘—ä½œæ¨©è¡¨ç¤ºï¼Œã“ã®åˆ©ç”¨æ¡ä»¶ãŠã‚ˆã³ä¸‹è¨˜
+ *      ã®ç„¡ä¿è¨¼è¦å®šã‚’æ²è¼‰ã™ã‚‹ã“ã¨ï¼
+ *  (3) æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚’ï¼Œæ©Ÿå™¨ã«çµ„ã¿è¾¼ã‚€ãªã©ï¼Œä»–ã®ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢é–‹ç™ºã«ä½¿
+ *      ç”¨ã§ããªã„å½¢ã§å†é…å¸ƒã™ã‚‹å ´åˆã«ã¯ï¼Œæ¬¡ã®ã„ãšã‚Œã‹ã®æ¡ä»¶ã‚’æº€ãŸã™ã“
+ *      ã¨ï¼
+ *    (a) å†é…å¸ƒã«ä¼´ã†ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆï¼ˆåˆ©ç”¨è€…ãƒãƒ‹ãƒ¥ã‚¢ãƒ«ãªã©ï¼‰ã«ï¼Œä¸Šè¨˜ã®è‘—
+ *        ä½œæ¨©è¡¨ç¤ºï¼Œã“ã®åˆ©ç”¨æ¡ä»¶ãŠã‚ˆã³ä¸‹è¨˜ã®ç„¡ä¿è¨¼è¦å®šã‚’æ²è¼‰ã™ã‚‹ã“ã¨ï¼
+ *    (b) å†é…å¸ƒã®å½¢æ…‹ã‚’ï¼Œåˆ¥ã«å®šã‚ã‚‹æ–¹æ³•ã«ã‚ˆã£ã¦ï¼ŒTOPPERSãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã«
+ *        å ±å‘Šã™ã‚‹ã“ã¨ï¼
+ *  (4) æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã®åˆ©ç”¨ã«ã‚ˆã‚Šç›´æ¥çš„ã¾ãŸã¯é–“æ¥çš„ã«ç”Ÿã˜ã‚‹ã„ã‹ãªã‚‹æ
+ *      å®³ã‹ã‚‰ã‚‚ï¼Œä¸Šè¨˜è‘—ä½œæ¨©è€…ãŠã‚ˆã³TOPPERSãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã‚’å…è²¬ã™ã‚‹ã“ã¨ï¼
+ *      ã¾ãŸï¼Œæœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã®ãƒ¦ãƒ¼ã‚¶ã¾ãŸã¯ã‚¨ãƒ³ãƒ‰ãƒ¦ãƒ¼ã‚¶ã‹ã‚‰ã®ã„ã‹ãªã‚‹ç†
+ *      ç”±ã«åŸºã¥ãè«‹æ±‚ã‹ã‚‰ã‚‚ï¼Œä¸Šè¨˜è‘—ä½œæ¨©è€…ãŠã‚ˆã³TOPPERSãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã‚’
+ *      å…è²¬ã™ã‚‹ã“ã¨ï¼
  * 
+ *  æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã¯ï¼Œç„¡ä¿è¨¼ã§æä¾›ã•ã‚Œã¦ã„ã‚‹ã‚‚ã®ã§ã‚ã‚‹ï¼ä¸Šè¨˜è‘—ä½œæ¨©è€…ãŠ
+ *  ã‚ˆã³TOPPERSãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã¯ï¼Œæœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã«é–¢ã—ã¦ï¼Œç‰¹å®šã®ä½¿ç”¨ç›®çš„
+ *  ã«å¯¾ã™ã‚‹é©åˆæ€§ã‚‚å«ã‚ã¦ï¼Œã„ã‹ãªã‚‹ä¿è¨¼ã‚‚è¡Œã‚ãªã„ï¼ã¾ãŸï¼Œæœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§
+ *  ã‚¢ã®åˆ©ç”¨ã«ã‚ˆã‚Šç›´æ¥çš„ã¾ãŸã¯é–“æ¥çš„ã«ç”Ÿã˜ãŸã„ã‹ãªã‚‹æå®³ã«é–¢ã—ã¦ã‚‚ï¼Œã
+ *  ã®è²¬ä»»ã‚’è² ã‚ãªã„ï¼
+ * 
+ *  $Id: time_event.c 532 2016-01-15 14:48:04Z ertl-hiro $
+ */
+
+/*
+ *		ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆç®¡ç†ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«
  */
 
 #include "kernel_impl.h"
 #include "time_event.h"
-
+#include "queue.h"
 
 /*
- *  Œ»İ‚ÌƒVƒXƒeƒ€i’PˆÊ: 1ƒ~ƒŠ•bj
- *
- *  Œµ–§‚É‚ÍC‘O‚Ìƒ^ƒCƒ€ƒeƒBƒbƒN‚ÌƒVƒXƒeƒ€D
+ *  TSTEP_HRTCNTã®ç¯„å›²ãƒã‚§ãƒƒã‚¯
  */
-EVTTIM	current_time;
+#if TSTEP_HRTCNT > 4000U
+#error TSTEP_HRTCNT is too large.
+#endif /* TSTEP_HRTCNT > 4000U */
 
 /*
- *  ƒ^ƒCƒ€ƒCƒxƒ“ƒgƒq[ƒv’†‚Å—LŒø‚ÈÅ¬‚ÌƒVƒXƒeƒ€i’PˆÊ: 1ƒ~ƒŠ•bj
+ *  HRTCNT_BOUNDã®ç¯„å›²ãƒã‚§ãƒƒã‚¯
  */
-EVTTIM	min_time;
+#if HRTCNT_BOUND >= 4294000000U
+#error HRTCNT_BOUND is too large.
+#endif /* HRTCNT_BOUND >= 4294000000U */
 
+#ifdef TCYC_HRTCNT
+#if HRTCNT_BOUND >= TCYC_HRTCNT
+#error HRTCNT_BOUND is too large.
+#endif /* HRTCNT_BOUND >= TCYC_HRTCNT */
+#endif /* TCYC_HRTCNT */
 
 /*
- *  ƒ^ƒCƒ€ƒCƒxƒ“ƒgƒLƒ…[‚ÌƒLƒ…[ƒwƒbƒ_
+ *  ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆã‚­ãƒ¥ãƒ¼ã®ã‚­ãƒ¥ãƒ¼ãƒ˜ãƒƒãƒ€
  *
- *  ƒ^ƒCƒ€ƒCƒxƒ“ƒgƒLƒ…[ƒuƒƒbƒN‚ÌI’[‚ÉŠm•Û‚·‚éD
+ *  ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆã‚­ãƒ¥ãƒ¼ãƒ–ãƒ­ãƒƒã‚¯ã®çµ‚ç«¯ã«ç¢ºä¿ã™ã‚‹ï¼
  */
 #define TMEVT_HEAD()	(tmevt_queue[tnum_tmevt_queue])
 #define TMEVT_NULL		((QUEIDX)tnum_tmevt_queue)
 
 /*
- *  ƒCƒxƒ“ƒg”­¶”äŠrƒ}ƒNƒ
- *
- *  ƒCƒxƒ“ƒg”­¶‚ÍCmin_time‚©‚ç‚Ì‘Š‘Î’l‚Å”äŠr‚·‚éD‚·‚È‚í‚¿C
- *  min_time‚ğÅ¬’liÅ‚à‹ß‚¢jCmit_time-1‚ªÅ‘å’liÅ‚à‰“‚¢j
- *  ‚Æ‚İ‚È‚µ‚Ä”äŠr‚·‚éD
+ *  ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆãƒ’ãƒ¼ãƒ—ä¸­ã®å…ˆé ­ã®ãƒãƒ¼ãƒ‰ã®æƒ…å ±
  */
-#define	EVTTIM_LT(t1, t2) (((t1) - min_time) < ((t2) - min_time))
-#define	EVTTIM_LE(t1, t2) (((t1) - min_time) <= ((t2) - min_time))
+#define top_evttim		(0)
+										/* å…ˆé ­ã®ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆã®ç™ºç”Ÿæ™‚åˆ» */
 
 /*
- *  ƒ^ƒCƒ€ƒCƒxƒ“ƒg‚Ì‰Šú‰»
+ *  ã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ã®å‰å¾Œé–¢ä¿‚ã®åˆ¤å®šï¼»ASPD1009ï¼½
+ *
+ *  ã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ã¯ï¼Œboundary_evttimã‹ã‚‰ã®ç›¸å¯¾å€¤ã§æ¯”è¼ƒã™ã‚‹ï¼ã™ãªã‚ã¡ï¼Œ
+ *  boundary_evttimã‚’æœ€ã‚‚æ—©ã„æ™‚åˆ»ï¼Œboundary_evttimâˆ’1ãŒæœ€ã‚‚é…ã„æ™‚åˆ»ã¨ã¿
+ *  ãªã—ã¦æ¯”è¼ƒã™ã‚‹ï¼
  */
+#define EVTTIM_ADVANCE(t)	((t) - boundary_evttim)
+#define EVTTIM_LT(t1, t2)	(EVTTIM_ADVANCE(t1) < EVTTIM_ADVANCE(t2))
+#define EVTTIM_LE(t1, t2)	(EVTTIM_ADVANCE(t1) <= EVTTIM_ADVANCE(t2))
 
-#ifdef TOPPERS_tmevtini
+#ifdef TOPPERS_tmeini
 
+/*
+ *  å¢ƒç•Œã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ï¼»ASPD1008ï¼½
+ */
+EVTTIM	boundary_evttim;
+
+/*
+ *  æœ€å¾Œã«ç¾åœ¨æ™‚åˆ»ã‚’ç®—å‡ºã—ãŸæ™‚ç‚¹ã§ã®ã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ï¼»ASPD1012ï¼½
+ */
+EVTTIM	current_evttim;
+
+/*
+ *  æœ€å¾Œã«ç¾åœ¨æ™‚åˆ»ã‚’ç®—å‡ºã—ãŸæ™‚ç‚¹ã§ã®é«˜åˆ†è§£èƒ½ã‚¿ã‚¤ãƒã®ã‚«ã‚¦ãƒ³ãƒˆå€¤ï¼»ASPD1012ï¼½
+ */
+HRTCNT	current_hrtcnt;
+
+/*
+ *  æœ€ã‚‚é€²ã‚“ã§ã„ãŸæ™‚ã®ã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ï¼»ASPD1041ï¼½
+ */
+EVTTIM	monotonic_evttim;
+
+/*
+ *  ã‚·ã‚¹ãƒ†ãƒ æ™‚åˆ»ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆï¼»ASPD1043ï¼½
+ */
+SYSTIM	systim_offset;
+
+/*
+ *  é«˜åˆ†è§£èƒ½ã‚¿ã‚¤ãƒå‰²è¾¼ã¿ã®å‡¦ç†ä¸­ã§ã‚ã‚‹ã“ã¨ã‚’ç¤ºã™ãƒ•ãƒ©ã‚°ï¼»ASPD1032ï¼½
+ */
+bool_t	in_signal_time;
+
+/*
+ *  ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆç®¡ç†ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®åˆæœŸåŒ–ï¼»ASPD1061ï¼½
+ */
 void
 initialize_time_event(void)
 {
-	/* •Ï”‚Ì‰Šú‰» */
-	current_time = 0U;
-	min_time = 0U;
+	current_evttim = 0U;							/*ï¼»ASPD1047ï¼½*/
+	boundary_evttim = current_evttim - BOUNDARY_MARGIN;
+													/*ï¼»ASPD1048ï¼½*/
+	monotonic_evttim = 0U;							/*ï¼»ASPD1046ï¼½*/
+	systim_offset = 0U;								/*ï¼»ASPD1044ï¼½*/
+	in_signal_time = false;							/*ï¼»ASPD1033ï¼½*/
 	
-	/* ƒ^ƒCƒ€ƒCƒxƒ“ƒgƒLƒ…[‚Ì‰Šú‰» */
-	queue_initialize(&TMEVT_HEAD() , (QUEIDX)tnum_tmevt_queue);
+	/* ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆã‚­ãƒ¥ãƒ¼ã®åˆæœŸåŒ– */
+	queue_initialize(&TMEVT_HEAD() , (QUEIDX)tnum_tmevt_queue);	
 }
 
-#endif /* TOPPERS_tmevtini */
+#endif /* TOPPERS_tmeini */
+
 
 /*
- *  ƒ^ƒCƒ€ƒCƒxƒ“ƒg‚Ì“o˜^
+ *  ç¾åœ¨ã®ã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ã®æ›´æ–°
  */
-
-#ifdef TOPPERS_tmevtenq
+#ifdef TOPPERS_tmecur
 
 void
-time_event_enqueue(ID tmevtid , EVTTIM evttim , CBACK callback , uintptr_t arg)
+update_current_evttim(void)
+{
+	HRTCNT	new_hrtcnt, hrtcnt_advance;
+	EVTTIM	previous_evttim;
+
+	new_hrtcnt = target_hrt_get_current();			/*ï¼»ASPD1013ï¼½*/
+	hrtcnt_advance = new_hrtcnt - current_hrtcnt;	/*ï¼»ASPD1014ï¼½*/
+#ifdef TCYC_HRTCNT
+	if (new_hrtcnt < current_hrtcnt) {
+		hrtcnt_advance += TCYC_HRTCNT;
+	}
+#endif /* TCYC_HRTCNT */
+
+	previous_evttim = current_evttim;
+	current_evttim += (EVTTIM) hrtcnt_advance;		/*ï¼»ASPD1015ï¼½*/
+	current_hrtcnt = new_hrtcnt;					/*ï¼»ASPD1016ï¼½*/
+	boundary_evttim = current_evttim - BOUNDARY_MARGIN;	/*ï¼»ASPD1011ï¼½*/
+
+	if (monotonic_evttim - previous_evttim < (EVTTIM) hrtcnt_advance) {
+#ifdef UINT64_MAX
+		if (current_evttim < monotonic_evttim) {
+			systim_offset += 1LLU << 32;			/*ï¼»ASPD1045ï¼½*/
+		}
+#endif /* UINT64_MAX */
+		monotonic_evttim = current_evttim;			/*ï¼»ASPD1042ï¼½*/
+	}
+}
+
+#endif /* TOPPERS_tmecur */
+
+/*
+ *  ç¾åœ¨ã®ã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ã‚’é…ã„æ–¹ã«ä¸¸ã‚ãŸã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ã®ç®—å‡ºï¼»ASPD1027ï¼½
+ *
+ *  ç¾åœ¨ã®ã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ã‚’æ›´æ–°ã—ãŸå¾Œã«å‘¼ã¶ã“ã¨ã‚’æƒ³å®šã—ã¦ã„ã‚‹ï¼
+ */
+Inline EVTTIM
+calc_current_evttim_ub(void)
+{
+	return(current_evttim + ((EVTTIM) TSTEP_HRTCNT));
+}
+
+/*
+ *  é«˜åˆ†è§£èƒ½ã‚¿ã‚¤ãƒå‰²è¾¼ã¿ã®ç™ºç”Ÿã‚¿ã‚¤ãƒŸãƒ³ã‚°ã®è¨­å®š
+ */
+#ifdef TOPPERS_tmeset
+
+void
+set_hrt_event(void)
+{
+	HRTCNT	hrtcnt;
+
+	if (!EVTTIM_LE(HRTCNT_BOUND, top_evttim)) {
+		target_hrt_set_event(HRTCNT_BOUND);			/*ï¼»ASPD1007ï¼½*/
+	}
+	else if (EVTTIM_LE(top_evttim, current_evttim)) {
+		target_hrt_raise_event();					/*ï¼»ASPD1017ï¼½*/
+	}
+	else {
+		hrtcnt = (HRTCNT)(top_evttim - current_evttim);
+		if (hrtcnt > HRTCNT_BOUND) {
+			target_hrt_set_event(HRTCNT_BOUND);		/*ï¼»ASPD1006ï¼½*/
+		}
+		else {
+			target_hrt_set_event(hrtcnt);			/*ï¼»ASPD1002ï¼½*/
+		}
+	}
+}
+
+#endif /* TOPPERS_tmeset */
+
+/*
+ *  ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆãƒ–ãƒ­ãƒƒã‚¯ã®ã‚­ãƒ¥ãƒ¼ã¸ã®æŒ¿å…¥
+ */
+#ifdef TOPPERS_tmereg
+
+void
+time_event_register(ID tmevtid , EVTTIM evttim , CBACK callback , uintptr_t arg)
 {
 	QUEIDX pos = TMEVT_HEAD().next;
 	
-	/* ‘}“üˆÊ’u‚ğŒŸõ */
+	/* æŒ¿å…¥ä½ç½®ã‚’æ¤œç´¢ */
 	while((pos != TMEVT_NULL)
 			&& (EVTTIM_LE(tmevt_time[pos] , evttim))) {
 		pos = tmevt_queue[pos].next;
 	}
 	
-	/* ƒLƒ…[‚É‘}“ü */
+	/* ã‚­ãƒ¥ãƒ¼ã«æŒ¿å…¥ */
 	queue_insert_prev(&(tmevt_queue[0]) , pos , (QUEIDX)tmevtid);
 	tmevt_callback[tmevtid] = (CBACK)callback;
 	tmevt_arg[tmevtid] = arg;
 	tmevt_time[tmevtid] = evttim;
 }
 
-#endif /* TOPPERS_tmevtenq */
+#endif /* TOPPERS_tmereg */
+
 
 /*
- *  ƒ^ƒCƒ€ƒCƒxƒ“ƒg‚Ìíœ
+ *  ç›¸å¯¾æ™‚é–“æŒ‡å®šã«ã‚ˆã‚‹ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆã®ç™»éŒ²
+ *  
  */
+#ifdef TOPPERS_tmeenq
 
-#ifdef TOPPERS_tmevtdeq
+void
+time_event_enqueue(ID tmevtid , EVTTIM evttim , CBACK callback , uintptr_t arg)
+{
+	RELTIM event_exec_time;
+	
+	/*
+	 *  ç¾åœ¨ã®ã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ã¨ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆã®ç™ºç”Ÿæ™‚åˆ»ã‚’æ±‚ã‚ã‚‹ï¼»ASPD1026ï¼½ï¼
+	 */
+	update_current_evttim();
+	event_exec_time = calc_current_evttim_ub() + evttim;
+	
+	/* ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆã‚­ãƒ¥ãƒ¼ã¸ã®ç™»éŒ² */
+	time_event_register((QUEIDX)tmevtid , event_exec_time , callback, arg);
+	
+	/*
+	 *  é«˜åˆ†è§£èƒ½ã‚¿ã‚¤ãƒå‰²è¾¼ã¿ã®ç™ºç”Ÿã‚¿ã‚¤ãƒŸãƒ³ã‚°ã‚’è¨­å®šã™ã‚‹ï¼»ASPD1031ï¼½
+	 *  ï¼»ASPD1034ï¼½ï¼
+	 */
+	if (!in_signal_time 
+	 && tmevtid == TMEVT_HEAD().next) {
+		set_hrt_event();
+	}
+}
+
+#endif /* TOPPERS_tmeenq */
+
+/*
+ *  ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆã®ç™»éŒ²è§£é™¤
+ */
+#ifdef TOPPERS_tmedeq
 
 void
 time_event_dequeue(ID tmevtid)
 {
-	/* ƒLƒ…[‚©‚çíœ */
-	(void)queue_delete_next(&(tmevt_queue[0]) , (QUEIDX)tmevtid);
+	QUEIDX next_index;
+
+	/*
+	 *  ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆãƒ–ãƒ­ãƒƒã‚¯ã‚’ãƒ’ãƒ¼ãƒ—ã‹ã‚‰å‰Šé™¤ã™ã‚‹ï¼»ASPD1039ï¼½ï¼
+	 */
+	next_index = queue_delete_next(&(tmevt_queue[0]) , (QUEIDX)tmevtid);
+
+	/*
+	 *  é«˜åˆ†è§£èƒ½ã‚¿ã‚¤ãƒå‰²è¾¼ã¿ã®ç™ºç”Ÿã‚¿ã‚¤ãƒŸãƒ³ã‚°ã‚’è¨­å®šã™ã‚‹ï¼»ASPD1040ï¼½ï¼
+	 */
+	if (!in_signal_time && next_index != TMEVT_NULL) {
+		update_current_evttim();
+		set_hrt_event();
+	}
 }
 
-#endif /* TOPPERS_tmevtdeq */
+#endif /* TOPPERS_tmedeq */
 
 /*
- *  ƒVƒXƒeƒ€‚Ì’Ê’m
+ *  é«˜åˆ†è§£èƒ½ã‚¿ã‚¤ãƒå‰²è¾¼ã¿ã®å‡¦ç†
  */
-
 #ifdef TOPPERS_sig_tim
 
 void
 signal_time(void)
 {
+	bool_t	callflag;
 	QUEIDX pos = TMEVT_HEAD().next , evtid;
-	
-	lock_cpu();
-	
-	/* Œ»İ‚ÌXV */
-	current_time += (EVTTIM)TIC_NUME;
-	
-	/* ƒR[ƒ‹ƒoƒbƒN‚ÌÀs */
-	while((pos != TMEVT_NULL)
-			&& EVTTIM_LT(tmevt_time[pos] , current_time)) {
-		(void)queue_delete_next(&(tmevt_queue[0]) , pos);
-		evtid = pos;
-		pos = tmevt_queue[pos].next;
-		(*tmevt_callback[evtid])(tmevt_arg[evtid]);
-	}
 
-	/* min_time‚ÌXV */
-	min_time = current_time;
-	
+	assert(sense_context());
+	assert(!sense_lock());
+
+	lock_cpu();
+	in_signal_time = true;							/*ï¼»ASPD1033ï¼½*/
+
+	do {
+		/*
+		 *  ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã‚’å‘¼ã³å‡ºã•ãªã‘ã‚Œã°ãƒ«ãƒ¼ãƒ—ã‚’æŠœã‘ã‚‹ï¼»ASPD1020ï¼½ï¼
+		 */
+		callflag = false;
+
+		/*
+		 *  ç¾åœ¨ã®ã‚¤ãƒ™ãƒ³ãƒˆæ™‚åˆ»ã‚’æ±‚ã‚ã‚‹ï¼»ASPD1022ï¼½ï¼
+		 */
+		update_current_evttim();
+
+		/*
+		 *  ç™ºç”Ÿæ™‚åˆ»ãŒcurrent_evttimä»¥å‰ã®ã‚¿ã‚¤ãƒ ã‚¤ãƒ™ãƒ³ãƒˆãŒã‚ã‚Œã°ï¼Œã‚¿ã‚¤
+		 *  ãƒ ã‚¤ãƒ™ãƒ³ãƒˆãƒ’ãƒ¼ãƒ—ã‹ã‚‰å‰Šé™¤ã—ï¼Œã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã‚’å‘¼ã³å‡ºã™
+		 *  ï¼»ASPD1018ï¼½ï¼»ASPD1019ï¼½ï¼
+		 */
+		
+		while((pos != TMEVT_NULL)
+				&& EVTTIM_LT(tmevt_time[pos] , current_hrtcnt)) {
+			(void)queue_delete_next(&(tmevt_queue[0]) , pos);
+			evtid = pos;
+			pos = tmevt_queue[pos].next;
+			(*tmevt_callback[evtid])(tmevt_arg[evtid]);
+			callflag = true;
+		}		
+	} while (callflag);								/*ï¼»ASPD1020ï¼½*/
+
+	/*
+	 *  é«˜åˆ†è§£èƒ½ã‚¿ã‚¤ãƒå‰²è¾¼ã¿ã®ç™ºç”Ÿã‚¿ã‚¤ãƒŸãƒ³ã‚°ã‚’è¨­å®šã™ã‚‹ï¼»ASPD1025ï¼½ï¼
+	 */
+	set_hrt_event();
+
+	in_signal_time = false;							/*ï¼»ASPD1033ï¼½*/
 	unlock_cpu();
 }
 
-#endif /* TOPPERS_sig_tim */
+#endif /* TOPPERS_sigtim */
