@@ -286,6 +286,7 @@ IncludeTrb("extension/eventflag.trb")
 IncludeTrb("extension/dataqueue.trb")
 IncludeTrb("extension/cyclic.trb")
 IncludeTrb("extension/alarm.trb")
+IncludeTrb("extension/time_event.trb")
 IncludeTrb("kernel/interrupt.trb")
 IncludeTrb("kernel/exception.trb")
 
@@ -416,28 +417,6 @@ if $tstksz + $istksz > $stksz
 end
 puts "=====================================\n"
 
-#
-#  タイムイベント管理
-#
-
-tnum_tmevt = $cfgData[:CRE_CYC].size + $cfgData[:CRE_ALM].size
-if tnum_tmevt > 0
-$kernelCfgC.comment_header("Time Event Management")
-$kernelCfgC.add(<<EOS)
-#define TNUM_TMEVT #{sprintf("%d", tnum_tmevt)}
-
-const uint_t _kernel_tnum_tmevt_queue = TNUM_TMEVT;
-
-QUEUE _kernel_tmevt_queue[TNUM_TMEVT+1];
-EVTTIM _kernel_tmevt_time[TNUM_TMEVT];
-CBACK _kernel_tmevt_callback[TNUM_TMEVT];
-uintptr_t _kernel_tmevt_arg[TNUM_TMEVT];
-EOS
-
-  # オブジェクト初期化関数の追加
-  $initializeFunctions.unshift("_kernel_initialize_time_event();")
-
-end
 
 #
 #  各モジュールの初期化関数
