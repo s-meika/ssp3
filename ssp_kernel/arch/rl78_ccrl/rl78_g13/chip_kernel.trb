@@ -192,6 +192,7 @@ $cfgData[:DEF_INH].each.with_index do |(key, params), index|
 	$kernelCfgAsm.add("\tPUSH AX")
 	$kernelCfgAsm.add("\tMOV CS, #HIGHW(_#{params[:inthdr]})")
 	$kernelCfgAsm.add("\tMOVW HL, #LOWW(_#{params[:inthdr]})")
+	$kernelCfgAsm.add("\tMOVW BC, ##{params[:inhno].val}")
 	$kernelCfgAsm.add("\tBR !!__kernel_interrupt")
 	$kernelCfgAsm.add("")
 end
