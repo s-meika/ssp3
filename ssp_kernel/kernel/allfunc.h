@@ -85,9 +85,12 @@
 #define TOPPERS_excini
 
 /* time_event.c */
-#define TOPPERS_tmevtini
-#define TOPPERS_tmevtenq
-#define TOPPERS_tmevtdeq
+#define TOPPERS_tmeini
+#define TOPPERS_tmecur
+#define TOPPERS_tmeset
+#define TOPPERS_tmereg
+#define TOPPERS_tmeenq
+#define TOPPERS_tmedeq
 #define TOPPERS_sig_tim
 
 /* cyclic.c */
