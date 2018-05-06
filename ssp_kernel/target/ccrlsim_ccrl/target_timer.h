@@ -89,11 +89,6 @@ extern void target_hrt_set_event(HRTCNT hrtcnt);
 extern void target_hrt_raise_event(void);
 
 /*
- *  割込みタイミングに指定する最大値
- */
-#define HRTCNT_BOUND	4000000002U
-
-/*
  *  高分解能タイマ割込みハンドラ
  */
 extern void target_hrt_handler(void);
