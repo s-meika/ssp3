@@ -5,6 +5,7 @@
 
 #define prc_initialize				_kernel_prc_initialize
 #define unused_interrupt			_kernel_unused_interrupt
+#define start_dispatch				_kernel_start_dispatch
 
 
 

@@ -6,6 +6,7 @@
 
 #undef prc_initialize
 #undef unused_interrupt
+#undef start_dispatch
 
 
 
