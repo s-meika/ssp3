@@ -46,6 +46,7 @@
 #include "task.h"
 #include "t_stddef.h"
 #include "kernel_impl.h"
+#include "time_event.h"
 #include <sil.h>
 
 /*
@@ -99,6 +100,12 @@ sta_ker(void)
 	 *  初期化ルーチンの実行
 	 */ 
 	call_inirtn();
+	
+	/*
+	 *  高分解能タイマの設定
+	 */
+	current_hrtcnt = target_hrt_get_current();		/*［ASPD1063］*/
+	set_hrt_event();								/*［ASPD1064］*/
 	
 	/*
 	 *  カーネルの動作を開始する．
