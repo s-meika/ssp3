@@ -86,6 +86,7 @@ typedef struct
 	__far uint16_t *SS;
 	__far uint16_t *ST;
 	__far uint16_t *SOE;
+	__far uint16_t *SO;
 } SAU_REGADDRS;
 
 /*

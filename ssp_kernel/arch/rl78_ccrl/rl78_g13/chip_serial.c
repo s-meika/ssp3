@@ -48,6 +48,9 @@
 #define INDEX_PORT(x)	((x) - 1)
 #define GET_SIOPCB(x)	(&siopcb_table[INDEX_PORT(x)])
 
+#define PER0_ADDR			((uint8_t __far *)0xF00F0)	/* 周辺イネーブル・レジスタ 0 */
+#define NFEN0_ADDR			((uint16_t __far *)0xF0070)	/* ノイズ・フィルタ許可レジスタ 0 */
+
 /*
  *  UARTとSAUのユニット，チャネルの関係は以下の通り
  *
@@ -77,7 +80,8 @@ const SAU_REGADDRS sau_register_address_table[TNUM_UART_CH] =
 		(__far uint8_t  *)0xF0126 ,		/* SPS */
 		(__far uint16_t *)0xF0122 ,		/* SS  */
 		(__far uint16_t *)0xF0124 ,		/* ST  */
-		(__far uint16_t *)0xF012A  		/* SOE */
+		(__far uint16_t *)0xF012A ,		/* SOE */
+		(__far uint16_t *)0xF0128  		/* SO */
 	} ,
 	/* ID : 2 */
 	{
@@ -92,7 +96,8 @@ const SAU_REGADDRS sau_register_address_table[TNUM_UART_CH] =
 		(__far uint8_t  *)0xF0126 ,		/* SPS */
 		(__far uint16_t *)0xF0122 ,		/* SS  */
 		(__far uint16_t *)0xF0124 ,		/* ST  */
-		(__far uint16_t *)0xF012A  		/* SOE */
+		(__far uint16_t *)0xF012A ,		/* SOE */
+		(__far uint16_t *)0xF0128  		/* SO */
 	} ,
 	/* ID : 3 */
 	{
@@ -107,7 +112,8 @@ const SAU_REGADDRS sau_register_address_table[TNUM_UART_CH] =
 		(__far uint8_t  *)0xF0166 ,		/* SPS */
 		(__far uint16_t *)0xF0162 ,		/* SS  */
 		(__far uint16_t *)0xF0164 ,		/* ST  */
-		(__far uint16_t *)0xF016A  		/* SOE */
+		(__far uint16_t *)0xF016A ,		/* SOE */
+		(__far uint16_t *)0xF0128  		/* SO */
 	} ,
 	/* ID : 4 */
 	{
@@ -122,7 +128,8 @@ const SAU_REGADDRS sau_register_address_table[TNUM_UART_CH] =
 		(__far uint8_t  *)0xF0166 ,		/* SPS */
 		(__far uint16_t *)0xF0162 ,		/* SS  */
 		(__far uint16_t *)0xF0164 ,		/* ST  */
-		(__far uint16_t *)0xF016A  		/* SOE */
+		(__far uint16_t *)0xF016A ,		/* SOE */
+		(__far uint16_t *)0xF0128  		/* SO */
 	}
 };
 
@@ -165,7 +172,10 @@ void sau_init(uint_t ch)
 		return ;
 	}
 	
-	/* SAUの無効化(SCR,SOE,ST) */
+	/* SAUの有効化 */
+	sil_wrb_mem( PER0_ADDR, sil_reb_mem( PER0_ADDR ) | 0x04U );
+	
+	/* SAUの動作停止(SCR,SOE,ST) */
 	sil_wrh_mem(sau_regaddrs->ST , ~(0x0005U << ((ch % 2) * 2)));
 	sil_wrh_mem(sau_regaddrs->SOE , 
 		sil_reh_mem(sau_regaddrs->SOE) & ~(0x0005U << ((ch % 2) * 2)));
@@ -193,16 +203,20 @@ void sau_init(uint_t ch)
 		| (0U << 8U)           /* STS   : ソフトウェアトリガ */
 		| (0U << 14U)          /* CCS   : 転送クロックはCKSビットで選択 */
 		| (SIO_CLOCK << 15U)   /* CKS   :  */
-		);	
+		);
+	/* 受信フィルタ設定 */
+	sil_wrh_mem(NFEN0_ADDR, (1U << (ch * 2U)));
 	
 	/* 通信速度設定，上位8bitのみを設定 */
 	sil_wrb_mem((__far  uint8_t*)((uint32_t)sau_regaddrs->SDR_tx + 1) , COMM_CLOCK_VALUE );
 	sil_wrb_mem((__far  uint8_t*)((uint32_t)sau_regaddrs->SDR_rx + 1) , COMM_CLOCK_VALUE );
 	
 	
-	/* SAUの有効化 */
+	/* SAUの動作開始 */
 	sil_wrh_mem(sau_regaddrs->SCR , 
 		sil_reh_mem(sau_regaddrs->SCR) | 0xC000U);
+	sil_wrh_mem(sau_regaddrs->SO , 
+		sil_reh_mem(sau_regaddrs->SO) | (1U << ch));
 	sil_wrh_mem(sau_regaddrs->SOE , 
 		sil_reh_mem(sau_regaddrs->SOE) | (0x0005U << bitpos_of_ch_tx[ch]));
 	sil_wrh_mem(sau_regaddrs->SS , (0x0005U << bitpos_of_ch_tx[ch]));
