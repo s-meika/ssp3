@@ -49,8 +49,8 @@
 #define INTATR_HRT		TA_NULL			/* 割込み属性 */
 
 /* 使用タイマ番号 */
-#define TAU_NUMBER_MASTER	(4)
-#define TAU_NUMBER_SLAVE	(5)
+#define TAU_NUMBER_INTERVAL		(4)
+#define TAU_NUMBER_RAISE_INT	(5)
 
 
 #ifndef TOPPERS_MACRO_ONLY
@@ -100,7 +100,7 @@ extern void chip_hrt_set_event(HRTCNT hrtcnt);
 /*
  *  高分解能タイマ割込みの要求
  */
-extern void target_hrt_raise_event(void);
+extern void chip_hrt_raise_event(void);
 
 /*
  *  高分解能タイマ割込みハンドラ
