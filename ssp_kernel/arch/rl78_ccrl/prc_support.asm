@@ -7,8 +7,13 @@
 ;
 
 	.PUBLIC		__kernel_start_dispatch
-	.EXTERN		_dispatcher
 	.PUBLIC		__kernel_interrupt
+	.EXTERN		__kernel__dispatcher
+	.EXTERN		_intnest
+	.EXTERN		_lock_flag
+	.EXTERN		__kernel_reqflg
+	.EXTERN		__kernel_search_schedtsk
+	.EXTERN		__kernel_run_task
 
 __kernel_start_dispatch:
 	;/*
@@ -33,6 +38,67 @@ __kernel_start_dispatch:
 
 
 __kernel_interrupt:
+
+	; 割込み回数を加算
+	INC !_intnest
+	
+	; log_inh_enterの呼び出し
+$IFDEF LOG_INH_ENTER
+	PUSH HL
+$IFDEF LOG_INH_LEAVE
+	PUSH BC
+$ENDIF
+	MOVW AX, BC
+	call !!_log_inh_enter
+$IFDEF LOG_INH_LEAVE
+	POP BC
+$ENDIF
+	POP HL
+$ENDIF
+
+__kernel_call_int_handler:
+	; 割込みハンドラの呼び出し
+$IFDEF LOG_INH_LEAVE
+	PUSH BC
+$ENDIF
+	EI
+	CALL	HL
+	DI
+	
+	; 割込みハンドラで変更された状態を元に戻す
+	; 割込み優先度マスクは割込みコンテキストで修正できないため戻す必要がない
+	MOV !_lock_flag, #0
+	
+	; log_inh_leaveの呼び出し
+$IFDEF LOG_INH_LEAVE
+	POP BC
+$ENDIF
+$IFDEF LOG_INH_LEAVE
+	MOVW AX, BC
+	call !!_log_inh_leave
+$ENDIF
+
+	; 割込み回数を減算
+	DEC !_intnest
+	BZ  $__kernel_ret_int
+	; reqflgをチェック，スケジューラ実行要否をチェック
+	CMP !__kernel_reqflg, #1
+	BNZ  $__kernel_ret_int
+	
+__kernel_call_task:
+	; スケジューラを起動し，実行すべきタスクがあるならタスク実行ルーチンを呼び出す	
+	call !!__kernel_search_schedtsk
+	call !!__kernel_run_task
+__kernel_ret_int:
+	; コンテキストを復帰して割込み元へ戻る
+	POP AX
+	MOV ES, A
+	POP AX
+	MOV ES, A
+	POP HL
+	POP DE
+	POP BC
+	POP AX
 	RETI
 
 
