@@ -42,6 +42,16 @@
       <ArrayIndexNotation>None</ArrayIndexNotation>
     </Instance>
   </Class>
+  <Class Guid="cd02d324-a75c-4e2b-b858-33bd0d529683">
+    <Instance Guid="7f99f0d7-ad41-4e24-b822-a21c2c44cb6d">
+      <Name>PanelIORegister</Name>
+      <WatchExpressionColumnWidth>0</WatchExpressionColumnWidth>
+      <ValueColumnWindth>0</ValueColumnWindth>
+      <TypeColumnWidth>0</TypeColumnWidth>
+      <AddressColumnWidth>0</AddressColumnWidth>
+      <MemoColumnWidth>0</MemoColumnWidth>
+    </Instance>
+  </Class>
   <Class Guid="9e32877b-f8ee-49c6-a44e-88758c92bfd6">
     <Instance Guid="5009dc39-5303-442f-bf09-6ab41105c4e4">
       <Name>PanelCpuRegister</Name>
