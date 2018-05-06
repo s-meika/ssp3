@@ -19,7 +19,6 @@
 #undef actque_bitmap
 #undef reqflg
 #undef disdsp
-#undef get_ipri_self
 #undef get_ipri
 #undef bitmap_search_table
 #undef bitmap_search
@@ -123,7 +122,7 @@
 #undef cycevtid_offset
 #undef cycinib_cycact
 #undef cycinib_exinf
-#undef cycinib_cychdr
+#undef cycinib_nfyhdr
 #undef cycinib_cyctim
 #undef cycinib_cycphs
 #undef cyccb_evttim
@@ -156,162 +155,6 @@
 #undef target_exit
 
 
-#ifdef TOPPERS_LABEL_ASM
-
-/*
- *  startup.c
- */
-#undef _kerflg
-#undef _exit_kernel
-
-/*
- *  task.c
- */
-#undef _runtsk_curpri
-#undef _runtsk_ipri
-#undef _ready_primap
-#undef _actque_bitmap
-#undef _reqflg
-#undef _disdsp
-#undef _get_ipri_self
-#undef _get_ipri
-#undef _bitmap_search_table
-#undef _bitmap_search
-#undef _primap_empty
-#undef _primap_test
-#undef _primap_search
-#undef _primap_set
-#undef _primap_clear
-#undef _search_schedtsk
-#undef _test_dormant
-#undef _initialize_task
-#undef _make_active
-#undef _run_task
-#undef _dispatcher
-
-/*
- *  interrupt.c
- */
-#undef _initialize_interrupt
-
-/*
- *  exception.c
- */
-#undef _initialize_exception
-
-
-/*
- *  alarm.c
- */
-#undef _initialize_alarm
-#undef _call_almhdr
-
-/*
- *  cyclic.c
- */
-#undef _initialize_cyclic
-#undef _call_cychdr
-
-/*
- *  dataqueue.c
- */
-#undef _initialize_dataqueue
-#undef _send_data
-#undef _receive_data
-
-/*
- *  eventflag.c
- */
-#undef _initialize_eventflag
-
-/*
- *  time_event.c
- */
-#undef _current_time
-#undef _min_time
-#undef _initialize_time_event
-#undef _time_event_enqueue
-#undef _time_event_dequeue
-#undef _signal_time
-
-
-/*
- *  kernel_cfg.c
- */
-#undef _tmax_tskid
-#undef _tinib_tskatr
-#undef _init_rdypmap
-#undef _tinib_exinf
-#undef _tinib_task
-#undef _tinib_epriority
-
-#undef _tmax_flgid
-#undef _flginib_atr
-#undef _flginib_iflgptn
-#undef _flgcb_flgptn
-
-#undef _tmax_dtqid
-#undef _dtqinib_atr
-#undef _dtqinib_size
-#undef _dtqinib_data
-#undef _dtqcb_count
-#undef _dtqcb_head
-#undef _dtqcb_tail
-
-#undef _tnum_inhno
-#undef _inhinib_inhno
-#undef _inhinib_inhatr
-#undef _inhinib_entry
-
-#undef _tnum_intno
-#undef _intinib_intno
-#undef _intinib_intatr
-#undef _intinib_intpri
-
-#undef _tnum_excno
-#undef _excinib_excno
-#undef _excinib_excatr
-#undef _excinib_entry
-
-#undef _tmax_cycid
-#undef _cycevtid_offset
-#undef _cycinib_cycact
-#undef _cycinib_exinf
-#undef _cycinib_cychdr
-#undef _cycinib_cyctim
-#undef _cycinib_cycphs
-#undef _cyccb_evttim
-#undef _cyccb_cycact
-
-#undef _tmax_almid
-#undef _almevtid_offset
-#undef _alminib_almhdr
-#undef _alminib_exinf
-#undef _almcb_almact
-
-#undef _tnum_tmevt_queue
-#undef _tmevt_queue
-#undef _tmevt_time
-#undef _tmevt_callback
-#undef _tmevt_arg
-
-#undef _stksz
-#undef _stk
-#undef _istkpt
-
-#undef _initialize_object
-#undef _call_inirtn
-#undef _call_terrtn
-
-/*
- *  target_config.c
- */
-#undef _target_initialize
-#undef _target_exit
-
-
-#endif /* TOPPERS_LABEL_ASM */
-
-#include "target_unrename.h"
+#include "chip_unrename.h"
 
 #endif /* TOPPERS_KERNEL_RENAME_H */

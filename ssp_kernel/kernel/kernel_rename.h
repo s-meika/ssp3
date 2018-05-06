@@ -18,7 +18,6 @@
 #define actque_bitmap				_kernel_actque_bitmap
 #define reqflg						_kernel_reqflg
 #define disdsp						_kernel_disdsp
-#define get_ipri_self				_kernel_get_ipri_self
 #define get_ipri					_kernel_get_ipri
 #define bitmap_search_table			_kernel_bitmap_search_table
 #define bitmap_search				_kernel_bitmap_search
@@ -122,7 +121,7 @@
 #define cycevtid_offset				_kernel_cycevtid_offset
 #define cycinib_cycact				_kernel_cycinib_cycact
 #define cycinib_exinf				_kernel_cycinib_exinf
-#define cycinib_cychdr				_kernel_cycinib_cychdr
+#define cycinib_nfyhdr				_kernel_cycinib_nfyhdr
 #define cycinib_cyctim				_kernel_cycinib_cyctim
 #define cycinib_cycphs				_kernel_cycinib_cycphs
 #define cyccb_evttim				_kernel_cyccb_evttim
@@ -155,162 +154,6 @@
 #define target_exit					_kernel_target_exit
 
 
-#ifdef TOPPERS_LABEL_ASM
-
-/*
- *  startup.c
- */
-#define _kerflg						__kernel_kerflg
-#define _exit_kernel				__kernel_exit_kernel
-
-/*
- *  task.c
- */
-#define _runtsk_curpri				__kernel_runtsk_curpri
-#define _runtsk_ipri				__kernel_runtsk_ipri
-#define _ready_primap				__kernel_ready_primap
-#define _actque_bitmap				__kernel_actque_bitmap
-#define _reqflg						__kernel_reqflg
-#define _disdsp						__kernel_disdsp
-#define _get_ipri_self				__kernel_get_ipri_self
-#define _get_ipri					__kernel_get_ipri
-#define _bitmap_search_table		__kernel_bitmap_search_table
-#define _bitmap_search				__kernel_bitmap_search
-#define _primap_empty				__kernel_primap_empty
-#define _primap_test				__kernel_primap_test
-#define _primap_search				__kernel_primap_search
-#define _primap_set					__kernel_primap_set
-#define _primap_clear				__kernel_primap_clear
-#define _search_schedtsk			__kernel_search_schedtsk
-#define _test_dormant				__kernel_test_dormant
-#define _initialize_task			__kernel_initialize_task
-#define _make_active				__kernel_make_active
-#define _run_task					__kernel_run_task
-#define _dispatcher					__kernel_dispatcher
-
-/*
- *  interrupt.c
- */
-#define _initialize_interrupt		__kernel_initialize_interrupt
-
-/*
- *  exception.c
- */
-#define _initialize_exception		__kernel_initialize_exception
-
-
-/*
- *  alarm.c
- */
-#define _initialize_alarm			__kernel_initialize_alarm
-#define _call_almhdr				__kernel_call_almhdr
-
-/*
- *  cyclic.c
- */
-#define _initialize_cyclic			__kernel_initialize_cyclic
-#define _call_cychdr				__kernel_call_cychdr
-
-/*
- *  dataqueue.c
- */
-#define _initialize_dataqueue		__kernel_initialize_dataqueue
-#define _send_data					__kernel_send_data
-#define _receive_data				__kernel_receive_data
-
-/*
- *  eventflag.c
- */
-#define _initialize_eventflag		__kernel_initialize_eventflag
-
-/*
- *  time_event.c
- */
-#define _current_time				__kernel_current_time
-#define _min_time					__kernel_min_time
-#define _initialize_time_event		__kernel_initialize_time_event
-#define _time_event_enqueue			__kernel_time_event_enqueue
-#define _time_event_dequeue			__kernel_time_event_dequeue
-#define _signal_time				__kernel_signal_time
-
-
-/*
- *  kernel_cfg.c
- */
-#define _tmax_tskid					__kernel_tmax_tskid
-#define _tinib_tskatr				__kernel_tinib_tskatr
-#define _init_rdypmap				__kernel_init_rdypmap
-#define _tinib_exinf				__kernel_tinib_exinf
-#define _tinib_task					__kernel_tinib_task
-#define _tinib_epriority			__kernel_tinib_epriority
-
-#define _tmax_flgid					__kernel_tmax_flgid
-#define _flginib_atr				__kernel_flginib_atr
-#define _flginib_iflgptn			__kernel_flginib_iflgptn
-#define _flgcb_flgptn				__kernel_flgcb_flgptn
-
-#define _tmax_dtqid					__kernel_tmax_dtqid
-#define _dtqinib_atr				__kernel_dtqinib_atr
-#define _dtqinib_size				__kernel_dtqinib_size
-#define _dtqinib_data				__kernel_dtqinib_data
-#define _dtqcb_count				__kernel_dtqcb_count
-#define _dtqcb_head					__kernel_dtqcb_head
-#define _dtqcb_tail					__kernel_dtqcb_tail
-
-#define _tnum_inhno					__kernel_tnum_inhno
-#define _inhinib_inhno				__kernel_inhinib_inhno
-#define _inhinib_inhatr				__kernel_inhinib_inhatr
-#define _inhinib_entry				__kernel_inhinib_entry
-
-#define _tnum_intno					__kernel_tnum_intno
-#define _intinib_intno				__kernel_intinib_intno
-#define _intinib_intatr				__kernel_intinib_intatr
-#define _intinib_intpri				__kernel_intinib_intpri
-
-#define _tnum_excno					__kernel_tnum_excno
-#define _excinib_excno				__kernel_excinib_excno
-#define _excinib_excatr				__kernel_excinib_excatr
-#define _excinib_entry				__kernel_excinib_entry
-
-#define _tmax_cycid					__kernel_tmax_cycid
-#define _cycevtid_offset			__kernel_cycevtid_offset
-#define _cycinib_cycact				__kernel_cycinib_cycact
-#define _cycinib_exinf				__kernel_cycinib_exinf
-#define _cycinib_cychdr				__kernel_cycinib_cychdr
-#define _cycinib_cyctim				__kernel_cycinib_cyctim
-#define _cycinib_cycphs				__kernel_cycinib_cycphs
-#define _cyccb_evttim				__kernel_cyccb_evttim
-#define _cyccb_cycact				__kernel_cyccb_cycact
-
-#define _tmax_almid					__kernel_tmax_almid
-#define _almevtid_offset			__kernel_almevtid_offset
-#define _alminib_almhdr				__kernel_alminib_almhdr
-#define _alminib_exinf				__kernel_alminib_exinf
-#define _almcb_almact				__kernel_almcb_almact
-
-#define _tnum_tmevt_queue			__kernel_tnum_tmevt_queue
-#define _tmevt_queue				__kernel_tmevt_queue
-#define _tmevt_time					__kernel_tmevt_time
-#define _tmevt_callback				__kernel_tmevt_callback
-#define _tmevt_arg					__kernel_tmevt_arg
-
-#define _stksz						__kernel_stksz
-#define _stk						__kernel_stk
-#define _istkpt						__kernel_istkpt
-
-#define _initialize_object			__kernel_initialize_object
-#define _call_inirtn				__kernel_call_inirtn
-#define _call_terrtn				__kernel_call_terrtn
-
-/*
- *  target_config.c
- */
-#define _target_initialize			__kernel_target_initialize
-#define _target_exit				__kernel_target_exit
-
-
-#endif /* TOPPERS_LABEL_ASM */
-
-#include "target_rename.h"
+#include "chip_rename.h"
 
 #endif /* TOPPERS_KERNEL_RENAME_H */

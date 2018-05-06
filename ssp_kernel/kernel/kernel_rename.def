@@ -96,7 +96,7 @@ tmax_cycid
 cycevtid_offset
 cycinib_cycact
 cycinib_exinf
-cycinib_cychdr
+cycinib_nfyhdr
 cycinib_cyctim
 cycinib_cycphs
 cyccb_evttim
