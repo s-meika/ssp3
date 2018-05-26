@@ -979,6 +979,10 @@
       <DebuggerProperty-HookProperty-HookTransaction-Broke-Length>0</DebuggerProperty-HookProperty-HookTransaction-Broke-Length>
       <DebuggerProperty-HookProperty-HookTransaction-Connected-Length>0</DebuggerProperty-HookProperty-HookTransaction-Connected-Length>
       <DebuggerProperty-HookProperty-HookTransaction-Disconnecting-Length>0</DebuggerProperty-HookProperty-HookTransaction-Disconnecting-Length>
+      <Simulator-EditWave-WindowCount>0</Simulator-EditWave-WindowCount>
+      <Simulator-Panel-WindowCount>0</Simulator-Panel-WindowCount>
+      <Simulator-PrmFile-Contents>AQAAABgAAABzdGRpbwAkCwAAAAAAEAAAAAAAAAAAAAAAAAAA3NtPAEILW3MAEAAAAAAAAKgwZXMAAAAAqDBlczTdTwD0208ASQlbc7C0GxQA3E8AiqRbcxUAAAA83E8A8DVgc6gwZXPmNWBz2/OyyDTdTwAAAAAANN1PAAEAAAAQ3E8AsLQbFIjcTwBatmJzHxqdu/7////mNWBz80M3ZgEAAACoMGVzIBhntzTdTwAAAAAAtEU3Znmd/HYxCVtzsLQbFKgwZXMQsVMk2NxPAAAAAACE3E8ASQlbc7C0GxSQ3E8AiqRbcxUAAADA3E8ATkM3ZqgwZXNm4lNzf1CvKhCxUyQw3U8AJwAAAAEAAQABAAAAECcAAAAAAAAA6////wgAAAAwMDAwMDAwMAIAAAAuXA==</Simulator-PrmFile-Contents>
+      <Simulator-PrsFile-Contents>W1BhbmVsXQ0KUHVsbFVwIFBpbnM9DQpQdWxsRG93biBQaW5zPQ0KW01haW5dDQpGbGFnPTANClNob3dTdHlsZT0xDQpNaW5Qb3NpdGlvbi1YPS0xDQpNaW5Qb3NpdGlvbi1ZPS0xDQpNYXhQb3NpdGlvbi1YPS0xDQpNYXhQb3NpdGlvbi1ZPS0xDQpOb3JtYWxQb3NpdGlvbi1MZWZ0PTE1Ng0KTm9ybWFsUG9zaXRpb24tVG9wPTE1Ng0KTm9ybWFsUG9zaXRpb24tUmlnaHQ9MTU5Ng0KTm9ybWFsUG9zaXRpb24tQm90dG9tPTkxNQ0K</Simulator-PrsFile-Contents>
     </Instance>
   </Class>
   <Class Guid="67508d11-a84e-4956-9db4-04c1eefe9e7a">

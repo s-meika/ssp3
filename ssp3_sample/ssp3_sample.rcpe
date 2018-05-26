@@ -1998,6 +1998,7 @@
             <Path>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13\chip_serial.c</Path>
             <Path>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13\chip_serial.h</Path>
             <Path>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13\chip_kernel_impl.c</Path>
+            <Path>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13\chip_timer.c</Path>
           </Category>
           <Path>..\..\ssp_kernel\arch\rl78_ccrl\prc_kernel_impl.h</Path>
           <Path>..\..\ssp_kernel\arch\rl78_ccrl\prc_sil.h</Path>
@@ -2005,7 +2006,6 @@
           <Path>..\..\ssp_kernel\arch\rl78_ccrl\prc_kernel.h</Path>
           <Path>..\..\ssp_kernel\arch\rl78_ccrl\prc_support.asm</Path>
           <Path>..\..\ssp_kernel\arch\rl78_ccrl\prc_kernel_impl.c</Path>
-          <Path>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13\chip_timer.c</Path>
         </Category>
       </Category>
       <Category Name="extention">

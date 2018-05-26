@@ -127,3 +127,12 @@ target_exit(void)
 	}
 }
 
+/*
+ *  アイドルループ
+ */
+void idle_loop(void)
+{
+	unlock_cpu();
+	__nop();
+	lock_cpu();
+}

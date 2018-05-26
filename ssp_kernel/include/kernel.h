@@ -239,7 +239,7 @@ extern ER		get_tim(SYSTIM *p_systim);
 
 #define TPRI_INI		0			/* タスクの起動時優先度 */
 
-#define TIPM_ENAALL		0			/* 割込み優先度マスク全解除 */
+#define TIPM_ENAALL		3			/* 割込み優先度マスク全解除 */
 
 /*
  *  構成定数とマクロ

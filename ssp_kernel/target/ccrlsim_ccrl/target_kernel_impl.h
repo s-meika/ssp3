@@ -133,13 +133,9 @@ extern void	target_initialize(void);
 extern void	target_exit(void) NoReturn;
 
 /*
- *  アイドルループの実装
- *
+ *  アイドルループ
  */
-
-Inline void idle_loop(void)
-{
-}
+extern void idle_loop(void);
 
 /* チップ依存のカーネル依存部のインクルード */
 #include "chip_kernel_impl.h"

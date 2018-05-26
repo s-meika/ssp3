@@ -108,13 +108,6 @@
       <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
       <ParentItem>18f0667b-ef93-4c38-af6f-31abf4e7566a</ParentItem>
     </Instance>
-    <Instance Guid="b70baeaa-4065-46c8-a08b-e39e7ff86132">
-      <Name>chip_timer.c</Name>
-      <Type>File</Type>
-      <RelativePath>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13\chip_timer.c</RelativePath>
-      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
-      <ParentItem>18f0667b-ef93-4c38-af6f-31abf4e7566a</ParentItem>
-    </Instance>
     <Instance Guid="86396f97-ebcb-4705-9533-7b88e14edcff">
       <Name>chip_kernel_impl.h</Name>
       <Type>File</Type>
@@ -168,6 +161,13 @@
       <Name>chip_kernel_impl.c</Name>
       <Type>File</Type>
       <RelativePath>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13\chip_kernel_impl.c</RelativePath>
+      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>0b5d8e7a-d863-49ad-ba02-d1aa1f1139d5</ParentItem>
+    </Instance>
+    <Instance Guid="b70baeaa-4065-46c8-a08b-e39e7ff86132">
+      <Name>chip_timer.c</Name>
+      <Type>File</Type>
+      <RelativePath>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13\chip_timer.c</RelativePath>
       <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
       <ParentItem>0b5d8e7a-d863-49ad-ba02-d1aa1f1139d5</ParentItem>
     </Instance>

@@ -56,10 +56,10 @@ void prc_initialize(void)
 {
 	/*
 	 *  カーネル初期化時はCPUロック状態，割込み優先度マスクは
-	 *  最低レベル，割込みネスト数は0である
+	 *  CPUロックレベル，割込みネスト数は0である
 	 */
 	lock_flag = true;
-	saved_iipm = IIPM_ENAALL;
+	saved_iipm = TIPM_ENAALL;
 	intnest = 0U;
 }
 
