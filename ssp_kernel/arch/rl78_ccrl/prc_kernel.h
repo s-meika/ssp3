@@ -46,7 +46,7 @@
 
 
 /* CPUロック時のIPM */
-#define TIPM_LOCK		(2)
+#define TIPM_LOCK		(1)
 
 /* CPU例外はサポートしない(CPU例外に相当する事象は全てリセットとなるため) */
 #define OMIT_INITIALIZE_EXCEPTION
