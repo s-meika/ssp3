@@ -30,7 +30,7 @@ __kernel_start_dispatch:
 	
 	
 	; CPUロック状態への移行と全割込み禁止状態の解除
-	MOV PSW , #(TIPM_LOCK << 2)
+	MOV PSW , #(TIPM_LOCK << 1)
 	EI
 	
 	; ディスパッチャへ
@@ -38,7 +38,6 @@ __kernel_start_dispatch:
 
 
 __kernel_interrupt:
-
 	; 割込み回数を加算
 	INC !_intnest
 	
