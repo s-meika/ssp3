@@ -115,11 +115,11 @@ void chip_hrt_timer_initialize(intptr_t exinf)
 				| 0x0001U << 11U		/* MASTER:マスター動作 */
 				| 0x0000U << 8U 		/* STS:ソフトウェアトリガ */
 				| 0x0000U << 6U 		/* CIS:Don't care */
-				| 0x0004U << 0U			/* MD:ワンカウント */
+				| 0x0000U << 0U			/* MD:インターバル */
 			);
 	
 	/* 割込み許可 */
-	sil_wrb_mem(IFx , IFx_bit);
+	enable_int(TAU_NUMBER_RAISE_INT);
 	
 	/* タイマ開始 */
 	sil_wrb_mem( TS0L_ADDR , (0x01U << TAU_NUMBER_INTERVAL));
@@ -131,7 +131,7 @@ void chip_hrt_timer_initialize(intptr_t exinf)
 void chip_hrt_timer_terminate(intptr_t exinf)
 {
 	/* タイマ停止 */
-	sil_wrb_mem( TS0L_ADDR , ((0x01U << TAU_NUMBER_INTERVAL) | (0x01U << TAU_NUMBER_RAISE_INT)));
+	sil_wrb_mem(TS0L_ADDR , ((0x01U << TAU_NUMBER_INTERVAL) | (0x01U << TAU_NUMBER_RAISE_INT)));
 }
 
 
@@ -150,9 +150,9 @@ HRTCNT chip_hrt_timer_get_current(void)
 void chip_hrt_set_event(HRTCNT hrtcnt)
 {
 	/* タイマカウント設定 */
-	sil_wrh_mem( TDR0x_ADDR( TAU_NUMBER_RAISE_INT ), hrtcnt );
+	sil_wrh_mem(TDR0x_ADDR( TAU_NUMBER_RAISE_INT ), hrtcnt );
 	/* タイマ開始 */
-	sil_wrb_mem( TS0L_ADDR , (0x01U << TAU_NUMBER_RAISE_INT));
+	sil_wrb_mem(TS0L_ADDR , (0x01U << TAU_NUMBER_RAISE_INT));
 }
 
 /*
@@ -168,6 +168,8 @@ void chip_hrt_raise_event(void)
  */
 void chip_hrt_handler(void)
 {
+	sil_wrb_mem( TT0L_ADDR , (0x01U << TAU_NUMBER_RAISE_INT));
+	
 	signal_time();					/* 高分解能タイマ割込みの処理 */	
 }
 
