@@ -124,7 +124,7 @@ disable_int(INTNO intno)
  *  割込み要求禁止フラグのクリア
  *
  *  割込み属性が設定されていない割込み要求ラインに対して割込み要求禁止
- *  フラグをクリアしようとした場合には，falseを返す．
+ *  フラグをクリアしようとした場合には，falseを返す．	
  */
 Inline void
 enable_int(INTNO intno)
@@ -208,23 +208,23 @@ config_int(INTNO intno, ATR intatr, PRI intpri)
 	/* 割込み優先度 */
 	if(intpri == -1)
 	{
-		*(pri_reg1->address) |= pri_reg1->bitmask;
+		*(pri_reg1->address) &= ~(pri_reg1->bitmask);
 		*(pri_reg2->address) &= ~(pri_reg2->bitmask);
 	}
 	else if(intpri == -2)
 	{
-		*(pri_reg1->address) &= ~(pri_reg1->bitmask);
-		*(pri_reg2->address) |= pri_reg2->bitmask;
+		*(pri_reg1->address) |= pri_reg1->bitmask;
+		*(pri_reg2->address) &= ~(pri_reg2->bitmask);
 	}
 	else if(intpri == -3)
 	{
-		*(pri_reg1->address) |= pri_reg1->bitmask;
+		*(pri_reg1->address) &= ~(pri_reg1->bitmask);
 		*(pri_reg2->address) |= pri_reg2->bitmask;
 	}
-	else	/* 1 ～ 3以外 */
+	else	/* -1 ～ -3以外 */
 	{
-		*(pri_reg1->address) &= ~(pri_reg1->bitmask);
-		*(pri_reg2->address) &= ~(pri_reg2->bitmask);
+		*(pri_reg1->address) |= pri_reg1->bitmask;
+		*(pri_reg2->address) |= pri_reg2->bitmask;
 	}
 	
 	/* 割込みエッジ */
