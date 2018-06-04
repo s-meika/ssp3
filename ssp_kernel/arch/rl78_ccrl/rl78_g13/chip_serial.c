@@ -71,7 +71,8 @@ const SAU_REGADDRS sau_register_address_table[TNUM_UART_CH] =
 	{
 		(__far uint16_t *)0xF0110 ,		/* SMR_tx */
 		(__far uint16_t *)0xF0112 ,		/* SMR_rx */
-		(__far uint16_t *)0xF0118 ,		/* SCR */
+		(__far uint16_t *)0xF0118 ,		/* SCR_tx */
+		(__far uint16_t *)0xF011A ,		/* SCR_rx */
 		(__far uint16_t *)0xFFF10 ,		/* SDR_tx */
 		(__far uint16_t *)0xFFF12 ,		/* SDR_rx */
 		(__far uint16_t *)0xF0108 ,		/* SIR */
@@ -87,7 +88,8 @@ const SAU_REGADDRS sau_register_address_table[TNUM_UART_CH] =
 	{
 		(__far uint16_t *)0xF0114 ,		/* SMR_tx */
 		(__far uint16_t *)0xF0116 ,		/* SMR_rx */
-		(__far uint16_t *)0xF011C ,		/* SCR */
+		(__far uint16_t *)0xF011C ,		/* SCR_tx */
+		(__far uint16_t *)0xF011E ,		/* SCR_rx */
 		(__far uint16_t *)0xFFF44 ,		/* SDR_tx */
 		(__far uint16_t *)0xFFF46 ,		/* SDR_rx */
 		(__far uint16_t *)0xF010C ,		/* SIR */
@@ -103,7 +105,8 @@ const SAU_REGADDRS sau_register_address_table[TNUM_UART_CH] =
 	{
 		(__far uint16_t *)0xF0150 ,		/* SMR_tx */
 		(__far uint16_t *)0xF0152 ,		/* SMR_rx */
-		(__far uint16_t *)0xF0158 ,		/* SCR */
+		(__far uint16_t *)0xF0158 ,		/* SCR_tx */
+		(__far uint16_t *)0xF015A ,		/* SCR_rx */
 		(__far uint16_t *)0xFFF48 ,		/* SDR_tx */
 		(__far uint16_t *)0xFFF4A ,		/* SDR_rx */
 		(__far uint16_t *)0xF0148 ,		/* SIR */
@@ -119,7 +122,8 @@ const SAU_REGADDRS sau_register_address_table[TNUM_UART_CH] =
 	{
 		(__far uint16_t *)0xF0154 ,		/* SMR_tx */
 		(__far uint16_t *)0xF0156 ,		/* SMR_rx */
-		(__far uint16_t *)0xF015C ,		/* SCR */
+		(__far uint16_t *)0xF015C ,		/* SCR_tx */
+		(__far uint16_t *)0xF015E ,		/* SCR_rx */
 		(__far uint16_t *)0xFFF14 ,		/* SDR_tx */
 		(__far uint16_t *)0xFFF16 ,		/* SDR_rx */
 		(__far uint16_t *)0xF014C ,		/* SIR */
@@ -179,8 +183,10 @@ void sau_init(uint_t ch)
 	sil_wrh_mem(sau_regaddrs->ST , ~(0x0005U << ((ch % 2) * 2)));
 	sil_wrh_mem(sau_regaddrs->SOE , 
 		sil_reh_mem(sau_regaddrs->SOE) & ~(0x0005U << ((ch % 2) * 2)));
-	sil_wrh_mem(sau_regaddrs->SCR , 
-		sil_reh_mem(sau_regaddrs->SCR) & ~0xC000U);
+	sil_wrh_mem(sau_regaddrs->SCR_tx , 
+		sil_reh_mem(sau_regaddrs->SCR_rx) & ~0xC000U);
+	sil_wrh_mem(sau_regaddrs->SCR_tx , 
+		sil_reh_mem(sau_regaddrs->SCR_rx) & ~0xC000U);
 
 	/* 使用クロック設定 */
 	sil_wrb_mem(sau_regaddrs->SPS ,
@@ -195,6 +201,15 @@ void sau_init(uint_t ch)
 		| (0U << 14U)          /* CCS   : 転送クロックはCKSビットで選択 */
 		| (SIO_CLOCK << 15U)   /* CKS  :  */
 		);	
+		
+	/* 送信側通信動作設定 */
+	sil_wrh_mem(sau_regaddrs->SCR_tx , 
+		  (1U << 7U)           /* DIR   : MSBファースト */
+		| (1U << 4U)           /* SLC   : ストップビットなし */
+		| (1U << 2U)           /* Reserved */
+		| (3U << 0U)           /* DLS   : 8bit長 */
+		);
+	
 	/* 受信側チャネルモード設定 */
 	sil_wrh_mem(sau_regaddrs->SMR_rx ,
 		  (0U << 0U)           /* MD0   : 転送完了で割込み信号発生  */
@@ -204,22 +219,39 @@ void sau_init(uint_t ch)
 		| (0U << 14U)          /* CCS   : 転送クロックはCKSビットで選択 */
 		| (SIO_CLOCK << 15U)   /* CKS   :  */
 		);
+
+	/* 受信側通信動作設定 */
+	sil_wrh_mem(sau_regaddrs->SCR_rx , 
+		  (1U << 7U)           /* DIR   : MSBファースト */
+		| (1U << 4U)           /* SLC   : ストップビットなし */
+		| (1U << 2U)           /* Reserved */
+		| (3U << 0U)           /* DLS   : 8bit長 */
+		);
+
 	/* 受信フィルタ設定 */
 	sil_wrh_mem(NFEN0_ADDR, (1U << (ch * 2U)));
 	
 	/* 通信速度設定，上位8bitのみを設定 */
-	sil_wrb_mem((__far  uint8_t*)((uint32_t)sau_regaddrs->SDR_tx + 1) , COMM_CLOCK_VALUE );
-	sil_wrb_mem((__far  uint8_t*)((uint32_t)sau_regaddrs->SDR_rx + 1) , COMM_CLOCK_VALUE );
+	sil_wrb_mem((__far  uint8_t*)((uint32_t)sau_regaddrs->SDR_tx + 1) , COMM_CLOCK_VALUE << 1);
+	sil_wrb_mem((__far  uint8_t*)((uint32_t)sau_regaddrs->SDR_rx + 1) , COMM_CLOCK_VALUE << 1);
 	
 	
 	/* SAUの動作開始 */
-	sil_wrh_mem(sau_regaddrs->SCR , 
-		sil_reh_mem(sau_regaddrs->SCR) | 0xC000U);
+	sil_wrh_mem(sau_regaddrs->SCR_tx , 
+		sil_reh_mem(sau_regaddrs->SCR_tx) | 0x8000U);
+	sil_wrh_mem(sau_regaddrs->SCR_rx , 
+		sil_reh_mem(sau_regaddrs->SCR_rx) | 0x4000U);
 	sil_wrh_mem(sau_regaddrs->SO , 
 		sil_reh_mem(sau_regaddrs->SO) | (1U << ch));
 	sil_wrh_mem(sau_regaddrs->SOE , 
 		sil_reh_mem(sau_regaddrs->SOE) | (0x0005U << bitpos_of_ch_tx[ch]));
-	sil_wrh_mem(sau_regaddrs->SS , (0x0005U << bitpos_of_ch_tx[ch]));
+	sil_wrh_mem(sau_regaddrs->SS , (0x0003U << bitpos_of_ch_tx[ch]));
+	
+	/* 割込み許可 */
+	clr_int(INTNO_SIO_TX);
+	clr_int(INTNO_SIO_RX);
+	ena_int(INTNO_SIO_TX);
+	ena_int(INTNO_SIO_RX);
 	
 	siopcb_table[ch].initialized = true;
 }
@@ -237,8 +269,10 @@ void sau_term(uint_t ch)
 	sil_wrh_mem(sau_regaddrs->ST , ~(0x0003U << ((ch % 2) * 2)));
 	sil_wrh_mem(sau_regaddrs->SOE , 
 		sil_reh_mem(sau_regaddrs->SOE) & ~(0x0003U << ((ch % 2) * 2)));
-	sil_wrh_mem(sau_regaddrs->SCR , 
-		sil_reh_mem(sau_regaddrs->SCR) & ~0xC000U);	/* 割込み要因クリア */
+	sil_wrh_mem(sau_regaddrs->SCR_tx , 
+		sil_reh_mem(sau_regaddrs->SCR_tx) & ~0xC000U);	/* 送信禁止 */
+	sil_wrh_mem(sau_regaddrs->SCR_rx , 
+		sil_reh_mem(sau_regaddrs->SCR_rx) & ~0xC000U);	/* 受信禁止 */
 	
 	siopcb_table[ch].initialized = false;	
 }
@@ -252,8 +286,8 @@ void target_usart_term(ID uart_id)
 	sau_term(uart_id);
 	
 	/* 割込み禁止 */
-	(void)ena_int(INTNO_SIO_TX);
-	(void)ena_int(INTNO_SIO_RX);
+	(void)dis_int(INTNO_SIO_TX);
+	(void)dis_int(INTNO_SIO_RX);
 	/* 割込み要因クリア */
 	(void)clr_int(INTNO_SIO_TX);
 	(void)clr_int(INTNO_SIO_RX);

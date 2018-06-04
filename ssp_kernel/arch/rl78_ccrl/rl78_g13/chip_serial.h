@@ -76,7 +76,8 @@ typedef struct
 {
 	__far uint16_t *SMR_tx;
 	__far uint16_t *SMR_rx;
-	__far uint16_t *SCR;
+	__far uint16_t *SCR_tx;
+	__far uint16_t *SCR_rx;
 	__far uint16_t *SDR_tx;
 	__far uint16_t *SDR_rx;
 	__far uint16_t *SIR;
