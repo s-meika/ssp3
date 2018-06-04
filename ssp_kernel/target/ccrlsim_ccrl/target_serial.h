@@ -50,31 +50,37 @@
 #include "target_syssvc.h"
 #include "chip_serial.h"
 
-/* デフォルトではSIO0を使う */
+/* デフォルトではポート1を使う */
 #ifndef SIO_PORTID
-#define SIO_PORTID 0
+#define SIO_PORTID 1
 #endif /* SIO_PORTID */
 
 /*
  *  SIOの割込みベクタ番号
  */
-#if (SIO_PORTID == 0)
+#if (SIO_PORTID == 1)
 #define INHNO_SIO_TX		INTST0
 #define INTNO_SIO_TX		INTST0
 #define INHNO_SIO_RX		INTSR0
 #define INTNO_SIO_RX		INTSR0
-#elif (SIO_PORTID == 1)
+#elif (SIO_PORTID == 2)
 #define INHNO_SIO_TX		INTST1
 #define INTNO_SIO_TX		INTST1
 #define INHNO_SIO_RX		INTSR1
 #define INTNO_SIO_RX		INTSR1
-#elif (SIO_PORTID == 2)
+#elif (SIO_PORTID == 3)
 #define INHNO_SIO_TX		INTST2
 #define INTNO_SIO_TX		INTST2
 #define INHNO_SIO_RX		INTSR2
 #define INTNO_SIO_RX		INTSR2
+#elif (SIO_PORTID == 4)
+#define INHNO_SIO_TX		INTST3
+#define INTNO_SIO_TX		INTST3
+#define INHNO_SIO_RX		INTSR3
+#define INTNO_SIO_RX		INTSR3
 #endif
-#define INTPRI_SIO		-1				/* 割込み優先度 */
+
+#define INTPRI_SIO		-2				/* 割込み優先度 */
 #define INTATR_SIO		0				/* 割込み属性 */
 
 /*
