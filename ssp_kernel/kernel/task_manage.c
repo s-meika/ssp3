@@ -83,7 +83,7 @@ act_tsk(ID tskid)
 	lock_cpu();
 	if (test_dormant(itskpri)) {
 		if(make_active(itskpri)) {
-			if(sense_context()){
+			if(!sense_context()){
 				run_task(itskpri);
 			}
 			else {
