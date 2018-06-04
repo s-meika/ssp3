@@ -177,7 +177,7 @@ Inline bool_t check_intno_clear(INTNO intno)
  */
 Inline bool_t check_intno_cfg(INTNO intno)
 {
-	return (_kernel_bitpat_cfgint[(intno >> 5)] & (1U << (intno & 0x01FU))) != 0U;
+	return (_kernel_bitpat_cfgint[(intno >> 5)] & ((uint32_t)1U << (intno & 0x01FU))) != 0U;
 }
 
 
