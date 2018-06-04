@@ -79,7 +79,7 @@ $ENDIF
 
 	; 割込み回数を減算
 	DEC !_intnest
-	BZ  $__kernel_ret_int
+	BNZ  $__kernel_ret_int
 	; reqflgをチェック，スケジューラ実行要否をチェック
 	CMP !__kernel_reqflg, #1
 	BNZ  $__kernel_ret_int
