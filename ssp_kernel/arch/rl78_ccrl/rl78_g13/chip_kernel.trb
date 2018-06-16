@@ -142,10 +142,10 @@ $kernelCfgAsm.add(<<EOS)
 ;  Vector Table
 ;
 
-	.SECTION .vect , CONSTF
+	.SECTION .reset , CONSTF
 vector_table:
 	.DB2 LOWW( _start )		; Reset Vector
-	.DB2 0x00				; Empty
+	.SECTION .vect , CONSTF
 EOS
 
 
