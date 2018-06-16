@@ -239,7 +239,7 @@
       <COptionIgnoreFilesMisra-DefaultValue />
       <COptionCheckLanguageExtension-DefaultValue>False</COptionCheckLanguageExtension-DefaultValue>
       <IsLockedByUser>False</IsLockedByUser>
-      <TimeTagModified--0>-8587033770407835381</TimeTagModified--0>
+      <TimeTagModified--0>-8586730860230810585</TimeTagModified--0>
       <COptionAnsi-0>False</COptionAnsi-0>
       <COptionAsmPath-0>False</COptionAsmPath-0>
       <COptionCharacterSet-0>Auto</COptionCharacterSet-0>
@@ -253,7 +253,7 @@
 %MainProjectDir%\..\ssp_kernel\extension
 %MainProjectDir%\..\ssp_kernel\syssvc
 %MainProjectDir%\..\ssp_kernel\pdic
-%MainProjectDir%\..\ssp_kernel\target\ccrlsim_ccrl
+%MainProjectDir%\..\ssp_kernel\target\hsb78g13_100b_ccrl
 %MainProjectDir%\..\ssp_kernel\arch\rl78_ccrl\rl78_g13
 %MainProjectDir%\..\ssp_kernel\arch
 %MainProjectDir%\..\ssp_kernel\arch\ccrl

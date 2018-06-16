@@ -44,12 +44,31 @@
 	.extern _sta_ker
 	.extern _hardware_init_hook
 	.extern _software_init_hook
+	
+; RAM領域終端(全型番共通)
+RAM_END	.equ 0xFFEDF
 
 .SECTION .start , TEXTF
 _start:
 
 ; 割込み禁止
 	DI
+
+;
+; RAMパリティを設定するために全領域を0クリア
+;
+; RAM_STARTはプロジェクトファイルで指定する
+;
+	MOVW	HL , #LOWW(RAM_START)
+	MOV	ES , #HIGHW(RAM_START)
+	MOVW	AX , #LOWW(RAM_END)
+ram_clear_loop:
+	CMPW	AX , HL
+	BZ		$ram_clear_end
+	MOV		ES:[HL] , #0
+	INCW	HL
+	BR 		$ram_clear_loop
+ram_clear_end:
 
 ; スタックポインタの初期化
 	MOVW	DE , #__kernel_istkpt

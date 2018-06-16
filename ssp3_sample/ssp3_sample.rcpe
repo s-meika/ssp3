@@ -39,7 +39,7 @@
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\extension</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\syssvc</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\pdic</IncludePathForC>
-          <IncludePathForC>%MainProjectDir%\..\ssp_kernel\target\ccrlsim_ccrl</IncludePathForC>
+          <IncludePathForC>%MainProjectDir%\..\ssp_kernel\target\hsb78g13_100b_ccrl</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\arch</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\arch\ccrl</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\arch\rl78_ccrl</IncludePathForC>
@@ -67,7 +67,7 @@
           <Option>-I %MainProjectDir%\..\ssp_kernel\extension</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\syssvc</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\pdic</Option>
-          <Option>-I %MainProjectDir%\..\ssp_kernel\target\ccrlsim_ccrl</Option>
+          <Option>-I %MainProjectDir%\..\ssp_kernel\target\hsb78g13_100b_ccrl</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\arch</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\arch\ccrl</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\arch\rl78_ccrl</Option>
@@ -96,10 +96,10 @@
           <Option>-LIBrary=%MicomToolPath%\CC-RL\V1.04.00\lib\malloc_n.lib</Option>
           <Option>-LIBrary=%MicomToolPath%\CC-RL\V1.04.00\lib\rl78cm4r.lib</Option>
           <Option>-OCDBG=04</Option>
-          <Option>-USER_OPT_BYTE=FFFFE8</Option>
+          <Option>-USER_OPT_BYTE=00FFE8</Option>
           <Option>-LISt=%BuildModeName%\%ProjectName%.map</Option>
           <Option>-SHow=SYmbol,Total_size</Option>
-          <Option>-STARt=.vect/00000,.option_byte/000c0,.security_id/000C4,.start,.const,.text,.RLIB,.SLIB,.textf,.constf,.data,.sdata/03000,.dataR,.bss/F7F00,.sdataR,.sbss/FFE20</Option>
+          <Option>-STARt=.reset/00000,.vect/00004,.option_byte/000c0,.security_id/000C4,.start,.const,.text,.RLIB,.SLIB,.textf,.constf,.data,.sdata/03000,.dataR,.bss/F7F00,.sdataR,.sbss/FFE20</Option>
           <Option>-ROm=.data=.dataR</Option>
           <Option>-ROm=.sdata=.sdataR</Option>
           <Option>-NOMessage</Option>
@@ -137,7 +137,7 @@
             <Option>-I %MainProjectDir%\..\ssp_kernel\extension</Option>
             <Option>-I %MainProjectDir%\..\ssp_kernel\syssvc</Option>
             <Option>-I %MainProjectDir%\..\ssp_kernel\pdic</Option>
-            <Option>-I %MainProjectDir%\..\ssp_kernel\target\ccrlsim_ccrl</Option>
+            <Option>-I %MainProjectDir%\..\ssp_kernel\target\hsb78g13_100b_ccrl</Option>
             <Option>-I %MainProjectDir%\..\ssp_kernel\arch</Option>
             <Option>-I %MainProjectDir%\..\ssp_kernel\arch\ccrl</Option>
             <Option>-I %MainProjectDir%\..\ssp_kernel\arch\rl78_ccrl</Option>
@@ -2063,20 +2063,21 @@
         <Path>..\..\ssp_kernel\syssvc\banner.c</Path>
       </Category>
       <Category Name="target">
-        <Category Name="ccrlsim_ccrl">
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_kernel_impl.c</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_timer.c</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_cfg1_out.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_kernel.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_kernel_impl.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_rename.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_sil.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_stddef.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_syssvc.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_test.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_timer.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_unrename.h</Path>
-          <Path>..\..\ssp_kernel\target\ccrlsim_ccrl\target_serial.h</Path>
+        <Category Name="hsb78g13_100b">
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_unrename.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_kernel_impl.c</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_timer.c</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\hsb78g13_100b.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_cfg1_out.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_kernel.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_kernel_impl.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_rename.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_serial.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_sil.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_stddef.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_syssvc.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_test.h</Path>
+          <Path>..\..\ssp_kernel\target\hsb78g13_100b_ccrl\target_timer.h</Path>
         </Category>
       </Category>
     </Files>
@@ -2084,8 +2085,6 @@
     <BuildOptions Name="CC-RL" Version="V1.04.00">
       <BuildMode Name="DefaultBuild" Active="True">
         <LinkOrder>
-          <Path>DefaultBuild\target_kernel_impl.obj</Path>
-          <Path>DefaultBuild\target_timer.obj</Path>
           <Path>DefaultBuild\task_manage.obj</Path>
           <Path>DefaultBuild\task.obj</Path>
           <Path>DefaultBuild\sys_manage.obj</Path>
@@ -2106,8 +2105,11 @@
           <Path>DefaultBuild\prc_support.obj</Path>
           <Path>DefaultBuild\prc_kernel_impl.obj</Path>
           <Path>DefaultBuild\chip_kernel_impl.obj</Path>
+          <Path>DefaultBuild\target_kernel_impl.obj</Path>
+          <Path>DefaultBuild\target_timer.obj</Path>
         </LinkOrder>
         <CommonOptions>
+          <IncludePathForC>..\..\ssp_kernel\target\hsb78g13_100b_ccrl</IncludePathForC>
           <IncludePathForC>..\..\ssp_kernel\target\ccrlsim_ccrl</IncludePathForC>
           <IncludePathForC>..\..\ssp_kernel\arch\rl78_ccrl</IncludePathForC>
           <IncludePathForC>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13</IncludePathForC>
@@ -2138,6 +2140,7 @@
           <Option>-c</Option>
           <Option>-g</Option>
           <Option>-g_line</Option>
+          <Option>-I ..\..\ssp_kernel\target\hsb78g13_100b_ccrl</Option>
           <Option>-I ..\..\ssp_kernel\target\ccrlsim_ccrl</Option>
           <Option>-I ..\..\ssp_kernel\arch\rl78_ccrl</Option>
           <Option>-I ..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13</Option>
@@ -2193,8 +2196,6 @@
       </BuildMode>
       <BuildMode Name="Release" Active="False">
         <LinkOrder>
-          <Path>Release\target_kernel_impl.obj</Path>
-          <Path>Release\target_timer.obj</Path>
           <Path>Release\task_manage.obj</Path>
           <Path>Release\task.obj</Path>
           <Path>Release\sys_manage.obj</Path>
@@ -2219,8 +2220,11 @@
           <Path>Release\prc_support.obj</Path>
           <Path>Release\prc_kernel_impl.obj</Path>
           <Path>Release\chip_kernel_impl.obj</Path>
+          <Path>Release\target_kernel_impl.obj</Path>
+          <Path>Release\target_timer.obj</Path>
         </LinkOrder>
         <CommonOptions>
+          <IncludePathForC>..\..\ssp_kernel\target\hsb78g13_100b_ccrl</IncludePathForC>
           <IncludePathForC>..\..\ssp_kernel\target\ccrlsim_ccrl</IncludePathForC>
           <IncludePathForC>..\..\ssp_kernel\arch\rl78_ccrl</IncludePathForC>
           <IncludePathForC>..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13</IncludePathForC>
@@ -2248,6 +2252,7 @@
           <Option>-c</Option>
           <Option>-g</Option>
           <Option>-g_line</Option>
+          <Option>-I ..\..\ssp_kernel\target\hsb78g13_100b_ccrl</Option>
           <Option>-I ..\..\ssp_kernel\target\ccrlsim_ccrl</Option>
           <Option>-I ..\..\ssp_kernel\arch\rl78_ccrl</Option>
           <Option>-I ..\..\ssp_kernel\arch\rl78_ccrl\rl78_g13</Option>
@@ -3927,7 +3932,7 @@
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\extension</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\syssvc</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\pdic</IncludePathForC>
-          <IncludePathForC>%MainProjectDir%\..\ssp_kernel\target\ccrlsim_ccrl</IncludePathForC>
+          <IncludePathForC>%MainProjectDir%\..\ssp_kernel\target\hsb78g13_100b_ccrl</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\arch\rl78_ccrl\rl78_g13</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\arch</IncludePathForC>
           <IncludePathForC>%MainProjectDir%\..\ssp_kernel\arch\ccrl</IncludePathForC>
@@ -3955,7 +3960,7 @@
           <Option>-I %MainProjectDir%\..\ssp_kernel\extension</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\syssvc</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\pdic</Option>
-          <Option>-I %MainProjectDir%\..\ssp_kernel\target\ccrlsim_ccrl</Option>
+          <Option>-I %MainProjectDir%\..\ssp_kernel\target\hsb78g13_100b_ccrl</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\arch\rl78_ccrl\rl78_g13</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\arch</Option>
           <Option>-I %MainProjectDir%\..\ssp_kernel\arch\ccrl</Option>
