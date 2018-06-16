@@ -19,6 +19,6 @@ ruby ..\..\ssp_kernel\arch\ccrl\convmap2nmfmt.rb %1\cfg.map %1\cfg1_out.syms
 copy %1\cfg1_out.srec .
 copy %1\cfg1_out.syms .
 
-..\..\ssp_kernel\target\ccrlsim_ccrl\gen_kernel_configuration.bat ../../ssp_kernel ../../ssp_kernel/sample
+..\..\ssp_kernel\target\hsb78g13_100b_ccrl\gen_kernel_configuration.bat ../../ssp_kernel ../../ssp_kernel/sample
 
 copy kernel_cfg.h kernel_cfg.c %1
