@@ -144,6 +144,12 @@ const uint8_t bitpos_of_ch_rx[TNUM_UART_CH] = { 1U , 3U , 1U , 3U };
  */
 SIOPCB siopcb_table[TNUM_PORT];
 
+/*
+ * チャンネル初期化済みフラグ
+ *
+ * bss初期化で全てfalseになることを想定している
+ */
+bool_t sio_initialized[TNUM_PORT - 1];
 
 
 Inline bool_t  sio_putready(SIOPCB* siopcb)
@@ -165,13 +171,12 @@ Inline bool_t sio_getready(SIOPCB* siopcb)
  *
  *  低レベル出力の初期化でターゲット依存部が使用できるように外部公開する
  */
-
 void sau_init(uint_t ch)
 {
 	const SAU_REGADDRS *sau_regaddrs = &sau_register_address_table[ch];
 	
 	/* 初期化済みの場合はすぐにリターン */
-	if(siopcb_table[ch].initialized == true)
+	if(sio_initialized[ch] == true)
 	{
 		return ;
 	}
@@ -253,7 +258,7 @@ void sau_init(uint_t ch)
 	ena_int(INTNO_SIO_TX);
 	ena_int(INTNO_SIO_RX);
 	
-	siopcb_table[ch].initialized = true;
+	sio_initialized[ch] = true;
 }
 
 
@@ -274,7 +279,7 @@ void sau_term(uint_t ch)
 	sil_wrh_mem(sau_regaddrs->SCR_rx , 
 		sil_reh_mem(sau_regaddrs->SCR_rx) & ~0xC000U);	/* 受信禁止 */
 	
-	siopcb_table[ch].initialized = false;	
+	sio_initialized[ch] = false;	
 }
 
 /*
@@ -305,7 +310,6 @@ void sio_initialize(intptr_t exinf)
 		siopcb_table[i].port = i;
 		siopcb_table[i].regaddrs = &sau_register_address_table[i];
 		siopcb_table[i].exinf = 0;
-		siopcb_table[i].initialized = false;
 	}
 }
 
@@ -367,7 +371,7 @@ bool_t sio_snd_chr(SIOPCB *siopcb, char c)
 	bool_t ret = false;
 	
 	if (sio_putready(siopcb)) {
-		sil_wrb_mem((uint8_t __far *)sau_regaddrs->SDR_tx, c);
+		sil_wrb_mem((uint8_t __far *)sau_regaddrs->SDR_tx, (uint8_t)c);
 		ret = true;
 	}
 
@@ -394,16 +398,14 @@ int_t sio_rcv_chr(SIOPCB *siopcb)
  */
 void sio_ena_cbr(SIOPCB *siopcb, uint_t cbrtn)
 {
-	const SAU_REGADDRS *sau_regaddrs = siopcb->regaddrs;
-	
 	switch (cbrtn) {
 	case SIO_RDY_SND:
 		/* 送信チャネルを動作許可 */
-		sil_wrh_mem(sau_regaddrs->SS , 1U << bitpos_of_ch_tx[INDEX_PORT(siopcb->port)]);	
+		//sil_wrh_mem(sau_regaddrs->SS , 1U << bitpos_of_ch_tx[INDEX_PORT(siopcb->port)]);	
 		break;
 	case SIO_RDY_RCV:
 		/* 受信チャネルを動作許可 */
-		sil_wrh_mem(sau_regaddrs->SS , 1U << bitpos_of_ch_rx[INDEX_PORT(siopcb->port)]);
+		//sil_wrh_mem(sau_regaddrs->SS , 1U << bitpos_of_ch_rx[INDEX_PORT(siopcb->port)]);
 		break;
 	default:
 		break;
@@ -415,16 +417,16 @@ void sio_ena_cbr(SIOPCB *siopcb, uint_t cbrtn)
  */
 void sio_dis_cbr(SIOPCB *siopcb, uint_t cbrtn)
 {
-	const SAU_REGADDRS *sau_regaddrs = siopcb->regaddrs;
+	//const SAU_REGADDRS *sau_regaddrs = siopcb->regaddrs;
 	
 	switch (cbrtn) {
 	case SIO_RDY_SND:
 		/* 送信チャネルを動作禁止 */
-		sil_wrh_mem(sau_regaddrs->ST , 1U << bitpos_of_ch_tx[INDEX_PORT(siopcb->port)]);	
+		//sil_wrh_mem(sau_regaddrs->ST , 1U << bitpos_of_ch_tx[INDEX_PORT(siopcb->port)]);	
 		break;
 	case SIO_RDY_RCV:
 		/* 受信チャネルを動作禁止 */
-		sil_wrh_mem(sau_regaddrs->ST , 1U << bitpos_of_ch_rx[INDEX_PORT(siopcb->port)]);
+		//sil_wrh_mem(sau_regaddrs->ST , 1U << bitpos_of_ch_rx[INDEX_PORT(siopcb->port)]);
 		break;
 	default:
 		break;
@@ -438,8 +440,22 @@ void sio_pol_snd_chr(char c, ID siopid)
 {
 	const SAU_REGADDRS *sau_regaddrs = siopcb_table[INDEX_PORT(siopid)].regaddrs;
 	
-	while((sil_reh_mem(sau_regaddrs->SSR_tx) & (0x1U << 5)) != false )
+	while((sil_reh_mem(sau_regaddrs->SSR_tx) & (0x1U << 5)) != 0 )
 		;
 	
-	sil_wrb_mem((__far uint8_t *)sau_regaddrs->SDR_tx, (uint8_t)c);
+	sil_wrb_mem((uint8_t __far *)sau_regaddrs->SDR_tx, (uint8_t)c);
 }
+
+/*
+ *  低レベル1文字出力
+ */
+void sau_log_output(uint_t ch, char c)
+{
+	const SAU_REGADDRS *sau_regaddrs = siopcb_table[ch].regaddrs;
+	
+	while((sil_reh_mem(sau_regaddrs->SSR_tx) & (0x1U << 5)) != 0 )
+		;
+	
+	sil_wrb_mem((uint8_t __far *)sau_regaddrs->SDR_tx, (uint8_t)c);
+}
+ 

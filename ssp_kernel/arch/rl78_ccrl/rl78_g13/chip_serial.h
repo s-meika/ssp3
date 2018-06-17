@@ -49,28 +49,6 @@
 
 #define TNUM_UART_CH	(4)
 
-/* シリアルクロックの選択 */
-#define SIO_CKO0       (0U)
-#define SIO_CKO1       (1U)
-/* 上記のうちどちらかを選択する */
-#define SIO_CLOCK      SIO_CKO0
-
-/* SPSレジスタの設定 */
-#define SELECT_SPSm    (0U)	/* 0 か 1を設定 */
-
-#if defined(SIO_BPS_9600)
-#define PRS_VALUE     (4U)
-#define COMM_CLOCK_VALUE (103U)
-#elif defined(SIO_BPS_19200)
-#define PRS_VALUE     (3U)
-#define COMM_CLOCK_VALUE (103U)
-#elif defined(SIO_BPS_38400)
-#define PRS_VALUE     (2U)
-#define COMM_CLOCK_VALUE (103U)
-#else
-#error No defined SIO_BPS_XXX
-#endif
-
 #ifndef TOPPERS_MACRO_ONLY
 typedef struct
 {
@@ -97,8 +75,20 @@ typedef struct sio_port_control_block {
 	ID port;
 	const SAU_REGADDRS *regaddrs;
 	intptr_t exinf;
-	bool_t initialized;
 } SIOPCB;
+
+
+/*
+ *  UARTの初期化
+ */
+void sau_init(uint_t ch);
+
+/*
+ *  低レベル1文字出力
+ */
+extern void sau_log_output(uint_t ch, char c);
+
+
 #endif /* TOPPERS_MACRO_ONLY */
 
 #endif /* TOPPERS_CHIP_SERIAL_H */
