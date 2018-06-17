@@ -50,7 +50,7 @@ MINOR_VERSION = ($TKERNEL_PRVER >> 4) & 0xff
 PATCH_VERSION = ($TKERNEL_PRVER & 0x0f) 
 
 AUTHOR = <<EOS
-\t\t"Copyright (C) 2010,2017 by Meika Sugimoto\\n" \\
+\t\t"Copyright (C) 2010, 2017-2018 by Meika Sugimoto\\n" \\
 \t\t"Copyright (C) 2010 by Naoki Saito\\n"\t\\
 \t\t"            Nagoya Municipal Industrial Research Institute, JAPAN\\n" \\
 EOS
@@ -64,7 +64,7 @@ $kernelCfgC.add("#define TARGET_NAME")
 $kernelCfgC.add2("#endif /* TARGET_NAME */")
 
 BANNER = <<EOS
-"\\n" "#{KERNEL_NAME} " "#{sprintf("%d.%X.%d", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)} " \\
+"\\n" "#{KERNEL_NAME} " "#{sprintf("%d.%X.%d", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION)}" \\
 \t\t" for " TARGET_NAME " (" __DATE__ " , " __TIME__ ")\\n" \\
 #{AUTHOR}\t\tTARGET_COPYRIGHT "\\n";
 EOS
