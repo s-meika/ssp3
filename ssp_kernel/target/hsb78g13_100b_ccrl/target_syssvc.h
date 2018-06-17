@@ -65,9 +65,6 @@ extern void	target_fput_log(char c);
  */
 #define TARGET_NAME	"HSB78G13-100B"
 
-/* ターゲットのコピーライト */
-#define TARGET_COPYRIGHT "Copyright (C) 2018 by Meika Sugimoto"
-
 /*
  *  使用するシリアルポートID
  */
