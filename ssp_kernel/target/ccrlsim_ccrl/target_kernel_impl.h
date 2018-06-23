@@ -132,11 +132,6 @@ extern void	target_initialize(void);
  */
 extern void	target_exit(void) NoReturn;
 
-/*
- *  アイドルループ
- */
-extern void idle_loop(void);
-
 /* チップ依存のカーネル依存部のインクルード */
 #include "chip_kernel_impl.h"
 

@@ -262,6 +262,11 @@ define_exc(EXCNO excno, FP exc_entry)
 	/* CPU例外はサポートしない */
 }
 
+/*
+ *  アイドルループ
+ */
+extern void idle_loop(void);
+
 
 /*
  *  カーネルの終了処理の呼出し

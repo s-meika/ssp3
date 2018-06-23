@@ -132,7 +132,7 @@ target_initialize(void)
 	__far uint8_t * const p1 = (uint8_t __far *)0xFFF01;
 	
 	/* シリアルポートの端子初期化(P11:RXD0, P12:TXD0) */
-   	sil_wrb_mem(pm1, sil_reb_mem(pm1) & ~0x02); 
+   	sil_wrb_mem(pm1, sil_reb_mem(pm1) | 0x02); 
 	sil_wrb_mem(pm1, sil_reb_mem(pm1) & ~0x04); 
 	sil_wrb_mem(p1, sil_reb_mem(p1) | 0x04); 
 	
@@ -155,12 +155,3 @@ target_exit(void)
 	}
 }
 
-/*
- *  アイドルループ
- */
-void idle_loop(void)
-{
-	unlock_cpu();
-	__nop();
-	lock_cpu();
-}

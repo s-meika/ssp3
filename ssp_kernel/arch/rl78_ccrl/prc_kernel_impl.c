@@ -75,4 +75,18 @@ __near void unused_interrupt(void)
 		;
 }
 
+/*
+ *  アイドルループ
+ */
+void idle_loop(void)
+{
+	/* アイドルループ中の割込みを多重割込みとするために割込みネスト回数を1にして偽装 */
+	intnest = 1U;
+	
+	unlock_cpu();
+	__nop();
+	lock_cpu();
+	
+	intnest = 0U;
+}
 
