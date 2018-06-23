@@ -163,7 +163,7 @@ Inline bool_t sio_getready(SIOPCB* siopcb)
 {
 	const uint16_t ssr_bfe_bit = (0x1U << 5U);
 	
-	return (sil_reh_mem(siopcb->regaddrs->SSR_rx) & ssr_bfe_bit) == 0 ? true : false;
+	return (sil_reh_mem(siopcb->regaddrs->SSR_rx) & ssr_bfe_bit) != 0 ? true : false;
 }
 
 /*
@@ -220,7 +220,7 @@ void sau_init(uint_t ch)
 		  (0U << 0U)           /* MD0   : 転送完了で割込み信号発生  */
 		| (1U << 1U)           /* MD1,2 : UARTモード */
 		| (0U << 6U)           /* SIS   : レベル反転しない */
-		| (0U << 8U)           /* STS   : ソフトウェアトリガ */
+		| (1U << 8U)           /* STS   : RxDq端子の有効エッジ */
 		| (0U << 14U)          /* CCS   : 転送クロックはCKSビットで選択 */
 		| (SIO_CLOCK << 15U)   /* CKS   :  */
 		);
