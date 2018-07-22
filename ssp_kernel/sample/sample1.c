@@ -147,10 +147,9 @@ void init_task(intptr_t exinf)
 	/* 起動メッセージの出力 */
 	syslog(LOG_INFO , "Sample program starts.");
 
-#ifdef WITH_EXTENTION
 	/* 周期ハンドラの起動 */
 	SVC(sta_cyc(MAIN_CYC));
-#endif /* WITH_EXTENTION */	
+
 	/*
  	 *  ループ回数の設定
 	 *
@@ -160,7 +159,7 @@ void init_task(intptr_t exinf)
 	 *  MEASURE_TWICEがマクロ定義されている場合，1回目の測定結果を捨て
 	 *  て，2回目の測定結果を使う．1回目の測定は長めの時間が出るため．
 	 */
-#if defined(TASK_LOOP) || !defined(WITH_EXTENTION)
+#if defined(TASK_LOOP)
 	task_loop = TASK_LOOP;
 #else /* TASK_LOOP */
 
@@ -324,6 +323,7 @@ void alarm_handler(intptr_t exinf)
 	syslog(LOG_INFO , "Alarm handler is raised.");
 	SVC(iact_tsk(tskid));
 }
+#endif /* WITH_EXTENTION */
 
 void main_task_cychdr(intptr_t exinf)
 {
@@ -332,6 +332,7 @@ void main_task_cychdr(intptr_t exinf)
 	(void)iact_tsk(tskid);
 }
 
+#ifdef WITH_EXTENTION
 void cyclic_handler(intptr_t exinf)
 {
 	syslog(LOG_INFO , "Cyclic handler is raised.");
