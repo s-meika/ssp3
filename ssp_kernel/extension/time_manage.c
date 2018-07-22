@@ -52,7 +52,8 @@ get_tim(SYSTIM *p_systim)
 	CHECK_TSKCTX_UNL();
 	
 	lock_cpu();
-	*p_systim = current_time;
+	update_current_evttim();					/*［ASPD1057］*/
+	*p_systim = systim_offset + monotonic_evttim;	/*［ASPD1058］*/
 	ercd = E_OK;
 	unlock_cpu();
 	

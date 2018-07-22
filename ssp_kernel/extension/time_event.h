@@ -135,6 +135,12 @@ extern void
 time_event_dequeue(ID tmevtid);
 
 /*
+ *  現在のイベント時刻の更新
+ */
+extern void
+update_current_evttim(void);
+
+/*
  *  タイムティックの供給
  */
 extern void
