@@ -340,7 +340,7 @@ signal_time(void)
 		 */
 		
 		while((pos != TMEVT_NULL)
-				&& EVTTIM_LT(tmevt_time[pos] , current_hrtcnt)) {
+				&& EVTTIM_LT(tmevt_time[pos] , current_evttim)) {
 			(void)queue_delete_next(&(tmevt_queue[0]) , pos);
 			evtid = pos;
 			pos = tmevt_queue[pos].next;
