@@ -169,7 +169,7 @@ void init_task(intptr_t exinf)
 		/* 時間かせぎのためのループであり，ここでは何もしない */
 	}
 	SVC(get_tim(&stime2));
-	task_loop = LOOP_REF * 400UL / (stime2 - stime1);
+	task_loop = LOOP_REF * 400LU / (ulong_t)(stime2 - stime1) * 1000LU;
 
 #endif /* TASK_LOOP */
 
