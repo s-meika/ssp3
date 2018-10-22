@@ -72,7 +72,7 @@ act_tsk(ID tskid)
 	LOG_ACT_TSK_ENTER(tskid);
 	CHECK_UNL();								/*［NGKI1114］*/
 	
-	if ((tskid != TSK_SELF) && !sense_context()) {
+	if ((tskid == TSK_SELF) && !sense_context()) {
 		itskpri = runtsk_ipri;					/*［NGKI1121］*/
 	}
 	else {
