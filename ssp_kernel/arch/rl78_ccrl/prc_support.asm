@@ -85,9 +85,13 @@ $ENDIF
 	BNZ  $__kernel_ret_int
 	
 __kernel_call_task:
-	; スケジューラを起動し，実行すべきタスクがあるならタスク実行ルーチンを呼び出す	
-	call !!__kernel_search_schedtsk
-	call !!__kernel_run_task
+	MOV !__kernel_reqflg, #0
+	; スケジューラを起動し，実行すべきタスクがあるならタスク実行ルーチンを呼び出す
+	PUSH PSW
+	MOV PSW, #0x86
+	CALL !!__kernel_search_schedtsk
+	CALL !!__kernel_run_task
+	POP PSW
 __kernel_ret_int:
 	; コンテキストを復帰して割込み元へ戻る
 	POP AX
