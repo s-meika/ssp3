@@ -92,6 +92,7 @@ __kernel_call_task:
 	CALL !!__kernel_search_schedtsk
 	CALL !!__kernel_run_task
 	POP PSW
+	MOV	 !_lock_flag, #0
 __kernel_ret_int:
 	; コンテキストを復帰して割込み元へ戻る
 	POP AX
