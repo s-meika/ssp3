@@ -111,10 +111,11 @@ lock_cpu(void)
 	
 	current_psw = __get_psw();
 	
-	lock_flag = true;
 	saved_iipm = (current_psw & ISP_MASK) >> 0x1U;
 	
 	__set_psw(current_psw & ~ISP_MASK | (TIPM_LOCK << 1U));
+
+	lock_flag = true;
 	
 	__EI();
 }
@@ -138,7 +139,7 @@ unlock_cpu(void)
 	lock_flag = false;
 	
 	__set_psw(current_psw & ~ISP_MASK | (saved_iipm << 1U));
-	
+
 	__EI();
 }
 
