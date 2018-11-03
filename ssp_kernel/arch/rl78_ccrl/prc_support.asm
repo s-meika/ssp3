@@ -105,7 +105,7 @@ __kernel_ret_int:
 	POP AX
 	MOV ES, A
 	POP AX
-	MOV ES, A
+	MOV CS, A
 	POP HL
 	POP DE
 	POP BC
