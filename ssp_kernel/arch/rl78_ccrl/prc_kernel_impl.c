@@ -87,6 +87,7 @@ void idle_loop(void)
 	__nop();
 	lock_cpu();
 	
+	saved_iipm = 0x3;
 	intnest = 0U;
 }
 
