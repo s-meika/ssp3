@@ -194,7 +194,9 @@ void main_task(intptr_t exinf)
 		case 'p':
 		case 'd':
 		case 'r':
+#ifdef CPUEXC1
 		case 'z':
+#endif /* CPUEXC1 */
 			message[tskno-1] = c;
 		    break;
 		case '1':
