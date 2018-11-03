@@ -80,7 +80,7 @@
 #define INTNO_SIO_RX		INTSR3
 #endif
 
-#define INTPRI_SIO		-2				/* 割込み優先度 */
+#define INTPRI_SIO		-1				/* 割込み優先度 */
 #define INTATR_SIO		0				/* 割込み属性 */
 
 
