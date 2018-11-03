@@ -84,6 +84,7 @@ void hardware_init_hook(void)
 	__far uint8_t * const csc = (__far uint8_t * )0xFFFA1;
 	__far volatile uint8_t * const ostc = (__far volatile uint8_t * )0xFFFA2;
 	__far uint8_t * const osts = (__far uint8_t * )0xFFFA3;
+	__far uint8_t * const pm1 = (__far uint8_t * )0xFFF21;
 	
 	/* 10MHz < fx <= 20MHzで外部発振設定 */
 	*cmc = 0x51U;
@@ -97,7 +98,11 @@ void hardware_init_hook(void)
 		;
 	
 	/* クロック切換え */
-	*ckc = 0x10U;	
+	*ckc = 0x10U;
+	
+	/* LED */
+	*pm1 &= ~0x30;
+	
 }
 #endif /* USE_HARDWARE_INITHOOK */
 
