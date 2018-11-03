@@ -103,9 +103,9 @@ __kernel_call_task:
 __kernel_ret_int:
 	; コンテキストを復帰して割込み元へ戻る
 	POP AX
-	MOV ES, A
-	POP AX
 	MOV CS, A
+	POP AX
+	MOV ES, A
 	POP HL
 	POP DE
 	POP BC
