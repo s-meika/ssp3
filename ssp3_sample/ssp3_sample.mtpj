@@ -608,7 +608,7 @@
       <LinkOptionRrm-DefaultValue>False</LinkOptionRrm-DefaultValue>
       <LinkOptionRrmValue-DefaultValue />
       <IsLockedByUser>False</IsLockedByUser>
-      <TimeTagModified--0>-8586729799125356618</TimeTagModified--0>
+      <TimeTagModified--0>-8586597622918413106</TimeTagModified--0>
       <LinkOptionAutoSectionLayout-0>False</LinkOptionAutoSectionLayout-0>
       <LinkOptionCpu-0>False</LinkOptionCpu-0>
       <LinkOptionDebug-0>Debug</LinkOptionDebug-0>
@@ -638,7 +638,8 @@
       <LinkOptionVfinfoFolder-0>%BuildModeName%</LinkOptionVfinfoFolder-0>
       <LinkOptionCheckDevice-0>False</LinkOptionCheckDevice-0>
       <LinkOptionDebugMonitorSetting-0>None</LinkOptionDebugMonitorSetting-0>
-      <LinkOptionDefine-0 />
+      <LinkOptionDefine-0>RAM_START=F7F00
+</LinkOptionDefine-0>
       <LinkOptionFSymbol-0 />
       <LinkOptionHide-0>False</LinkOptionHide-0>
       <LinkOptionLibraryStandard-0>True</LinkOptionLibraryStandard-0>
