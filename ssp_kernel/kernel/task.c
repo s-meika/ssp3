@@ -251,6 +251,9 @@ initialize_task(void)
 	
 	/* 割込み禁止フラグの初期化 */
 	disdsp = false;
+	
+	/* タスクディスパッチ起動要求フラグの初期化 */
+	reqflg = false;
 }
 
 #endif /* TOPPERS_tskini */
