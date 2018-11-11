@@ -118,7 +118,6 @@ sta_cyc(ID cycid)
 {
 	ER ercd;
 	uint_t index = INDEX_CYC(cycid);
-	EVTTIM evttim;
 	
 	LOG_STA_CYC_ENTER(cycid);
 	CHECK_TSKCTX_UNL();
