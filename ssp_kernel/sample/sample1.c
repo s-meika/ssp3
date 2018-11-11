@@ -255,12 +255,11 @@ void task(intptr_t exinf)
 	volatile ulong_t i;
 	const char	*graph[] = { "|", "  +", "    *" };
 	bool_t cont = true;
-#ifdef WITH_EXTENTION
 	FLGPTN pattern;
 	const FLGPTN flgptn[] = { 0x00000001U, 0x00000002U, 0x00000004U };
 	const FLGPTN allptn = 0x00000007U;
 	intptr_t dtqdata;
-#endif /* WITH_EXTENTION */
+	
 	do
 	{
 		for (i = 0; i < task_loop; i++) {
@@ -281,8 +280,7 @@ void task(intptr_t exinf)
 			cont = false;
 			syslog(LOG_INFO, "#%d#terminate task", tskno);
 			break;
-#ifdef WITH_EXTENTION
-			case 's':
+		case 's':
 			SVC(set_flg(FLG1 , flgptn[tskno - 1]));
 			syslog(LOG_INFO, "#%d#set_flg(flgid=%d , mask=%d)",
 									tskno , FLG1 , flgptn[tskno - 1]);
@@ -303,7 +301,6 @@ void task(intptr_t exinf)
 			SVC(prcv_dtq(DTQ1 , (intptr_t *)(&dtqdata)));
 			syslog(LOG_INFO, "#%d#rcv_dtq(dtqid=%d , value=%u)", tskno , DTQ1 , dtqdata);
 			break;
-#endif /* WITH_EXTENTION */
 #ifdef CPUEXC1
 		case 'z':
 			syslog(LOG_NOTICE, "#%d#raise CPU exception", tskno);
