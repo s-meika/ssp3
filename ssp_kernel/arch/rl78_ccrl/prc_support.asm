@@ -80,24 +80,21 @@ $ENDIF
 	; 割込み回数を減算
 	DEC !_intnest
 	BNZ  $__kernel_ret_int
-	; reqflgをチェック，スケジューラ実行要否をチェック
-	CMP !__kernel_reqflg, #1
-	BNZ  $__kernel_ret_int
-	
+	; reqflgでスケジューラ実行要否をチェック
+	CMP !__kernel_reqflg, #0
+	BZ  $__kernel_ret_int
 __kernel_call_task:
 	; フラグをクリアし，今のCPUロック状態に関する情報をスタックに退避
 	MOV !__kernel_reqflg, #0
 	PUSH PSW
-	MOV A, !_saved_iipm
-	PUSH AX
-	; CPUロック状態と同等の状態にする
+	; CPUロック状態へ以降
+	MOV PSW , #(TIPM_LOCK << 1)	
 	MOV	 !_saved_iipm, #3
+	MOV	 !_lock_flag, #1
 	; スケジューラを起動し，実行すべきタスクがあるならタスク実行ルーチンを呼び出す
 	CALL !!__kernel_search_schedtsk
 	CALL !!__kernel_run_task
 	; CPUロック状態に関する情報をスタックから復帰してCPUロック状態も解除
-	POP AX
-	MOV !_saved_iipm, A
 	POP PSW
 	MOV	 !_lock_flag, #0
 __kernel_ret_int:

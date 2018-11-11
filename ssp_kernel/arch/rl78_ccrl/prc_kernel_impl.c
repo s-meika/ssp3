@@ -80,14 +80,19 @@ __near void unused_interrupt(void)
  */
 void idle_loop(void)
 {
+	extern bool_t reqflg;
 	/* アイドルループ中の割込みを多重割込みとするために割込みネスト回数を1にして偽装 */
 	intnest = 1U;
+	saved_iipm = 0x3;	
 	
-	unlock_cpu();
-	__nop();
-	lock_cpu();
+	do
+	{
+		unlock_cpu();
+		__nop();
+		lock_cpu();
+	} while(!reqflg);
 	
-	saved_iipm = 0x3;
+	reqflg = false;
 	intnest = 0U;
 }
 
