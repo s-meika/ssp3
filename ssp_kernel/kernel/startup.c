@@ -86,6 +86,8 @@ bool_t	kerflg = false;
 void
 sta_ker(void)
 {
+	extern void set_hrt_event(void);
+	
 	/*
 	 *  ターゲット依存の初期化
 	 */
